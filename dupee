@@ -1,0 +1,99 @@
+-- Create GUI Elements
+local screenGui = Instance.new("ScreenGui")
+local mainFrame = Instance.new("Frame")
+local titleLabel = Instance.new("TextLabel")
+local gemInputBox = Instance.new("TextBox")
+local dupeButton = Instance.new("TextButton")
+local footerLabel = Instance.new("TextLabel")
+
+-- Create UICorner for rounded corners
+local uiCornerMain = Instance.new("UICorner")
+local uiCornerButton = Instance.new("UICorner")
+local uiCornerInputBox = Instance.new("UICorner")
+local uiGradient = Instance.new("UIGradient") -- Added for gradient
+
+-- Parent the GUI Elements
+screenGui.Name = "GemSpawnerGui"
+screenGui.Parent = game:GetService("CoreGui")
+
+mainFrame.Name = "MainFrame"
+mainFrame.Parent = screenGui
+mainFrame.BackgroundColor3 = Color3.fromRGB(255, 255, 255) -- Base color
+mainFrame.Size = UDim2.new(0, 250, 0, 150)
+mainFrame.Position = UDim2.new(0.5, -125, 0.5, -75)
+mainFrame.Active = true
+mainFrame.Draggable = true
+
+-- Apply UICorner to MainFrame
+uiCornerMain.CornerRadius = UDim.new(0, 10)
+uiCornerMain.Parent = mainFrame
+
+-- Apply Gradient to MainFrame
+uiGradient.Parent = mainFrame
+uiGradient.Color = ColorSequence.new{
+    ColorSequenceKeypoint.new(0.0, Color3.fromRGB(33, 33, 33)), -- Dark gray
+    ColorSequenceKeypoint.new(1.0, Color3.fromRGB(60, 60, 60))  -- Slightly lighter gray
+}
+
+titleLabel.Name = "TitleLabel"
+titleLabel.Parent = mainFrame
+titleLabel.BackgroundTransparency = 1
+titleLabel.Size = UDim2.new(0, 200, 0, 25)
+titleLabel.Position = UDim2.new(0.5, -100, 0, 5) -- Centered at the top
+titleLabel.Text = "HUGE & TITANIC DUPER💎"
+titleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+titleLabel.TextSize = 16
+titleLabel.Font = Enum.Font.GothamBold
+titleLabel.TextXAlignment = Enum.TextXAlignment.Center
+titleLabel.TextScaled = true  -- Added
+
+gemInputBox.Name = "GemInputBox"
+gemInputBox.Parent = mainFrame
+gemInputBox.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+gemInputBox.Size = UDim2.new(0, 150, 0, 25)
+gemInputBox.Position = UDim2.new(0, 50, 0, 40)
+gemInputBox.PlaceholderText = "HUGE/TITANIC NAME"
+gemInputBox.Font = Enum.Font.GothamBold
+gemInputBox.TextScaled = true  -- Added
+
+-- Apply UICorner to TextBox
+uiCornerInputBox.CornerRadius = UDim.new(0, 5)
+uiCornerInputBox.Parent = gemInputBox
+
+dupeButton.Name = "DupeButton"
+dupeButton.Parent = mainFrame
+dupeButton.BackgroundColor3 = Color3.fromRGB(0, 255, 255) -- Light blue for diamond theme
+dupeButton.Size = UDim2.new(0, 200, 0, 25)
+dupeButton.Position = UDim2.new(0, 25, 0, 75)
+dupeButton.Text = "Start Duping!"
+dupeButton.Font = Enum.Font.GothamBold
+dupeButton.TextScaled = true  -- Added
+
+-- Apply UICorner to Button
+uiCornerButton.CornerRadius = UDim.new(0, 5)
+uiCornerButton.Parent = dupeButton
+
+footerLabel.Name = "FooterLabel"
+footerLabel.Parent = mainFrame
+footerLabel.BackgroundTransparency = 1
+footerLabel.Size = UDim2.new(0, 250, 0, 20)
+footerLabel.Position = UDim2.new(0, 0, 0, 120)
+footerLabel.Text = "Made By NerdyScripts📜"
+footerLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+footerLabel.TextSize = 12
+footerLabel.Font = Enum.Font.GothamBold
+footerLabel.TextXAlignment = Enum.TextXAlignment.Center
+footerLabel.TextScaled = true  -- Added
+
+-- Remove existing button functionality and replace it with new function
+dupeButton.MouseButton1Click:Connect(function()
+    local args = {
+        [1] = "10d0bb31ee3e4e13881b9e13d294170c"
+    }
+
+    -- Loop to execute the function up to 59 times with 1-second intervals
+    for i = 1, 59 do
+        game:GetService("ReplicatedStorage"):WaitForChild("Network"):WaitForChild("Pets_Favorite"):FireServer(unpack(args))
+        wait(1)  -- Wait 1 second before the next execution
+    end
+end)
