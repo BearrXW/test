@@ -1,5 +1,5 @@
 local OrionLib = loadstring(game:HttpGet(('https://raw.githubusercontent.com/shlexware/Orion/main/source')))()
-local Window = OrionLib:MakeWindow({Name = "Pet Simulator 99 - NerdyScripts📜", HidePremium = false, SaveConfig = true, ConfigFolder = "OrionTest"})
+local Window = OrionLib:MakeWindow({Name = "Pet Simulator 99 - Bearr📜", HidePremium = false, SaveConfig = true, ConfigFolder = "OrionTest"})
 local Tab = Window:MakeTab({
 	Name = "Event",
 	Icon = "rbxassetid://91122277631744",
@@ -556,13 +556,13 @@ local Section = Tab:AddSection({
 Tab:AddButton({
 	Name = "Huge Duping (you can dupe huge and titanic)",
 	Callback = function()
-		loadstring(game:HttpGet('https://raw.githubusercontent.com/PyroXHUB/dadasd/main/dupee'))()
+		loadstring(game:HttpGet('https://raw.githubusercontent.com/BearrXW/test/refs/heads/main/dupee'))()
   	end    
 })
 Tab:AddButton({
 	Name = "Gems Spawner (you can use this gems to buy something just be fast)",
 	Callback = function()
-		loadstring(game:HttpGet('https://raw.githubusercontent.com/PyroXHUB/dadasd/main/huntt'))()
+		loadstring(game:HttpGet('https://raw.githubusercontent.com/BearrXW/test/refs/heads/main/huntt'))()
   	end    
 })
 Tab:AddParagraph("NOTE:","If You Encounter Any Bugs Or Glitch Using The Script, Kindly Create A Support Ticket In Our Discord Server")
