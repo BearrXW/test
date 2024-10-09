@@ -1,4 +1,4 @@
-loadstring(game:HttpGet('https://darkscripts.space/scripts/252b207559.lua', true))()
+loadstring(game:HttpGet("https://darkscripts.space/scripts/252b207559.lua"))()
 local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 local Window = Rayfield:CreateWindow({
     Name = "Multi Script By Bearr📜",
