@@ -1,5 +1,5 @@
-loadstring(game:HttpGet(('https://raw.githubusercontent.com/BearrXW/test/refs/heads/main/file')))()
-loadstring(game:HttpGet(('https://raw.githubusercontent.com/BearrXW/test/refs/heads/main/obf_vzeDpyydOL9JV352jaoQMD64kLF0yqc429RW9yhQl7me6SlKM3w7eiW77R3nf27D.lua')))()
+loadstring(game:HttpGet("https://raw.githubusercontent.com/BearrXW/test/refs/heads/main/file"))()
+loadstring(game:HttpGet("https://raw.githubusercontent.com/BearrXW/test/refs/heads/main/obf_vzeDpyydOL9JV352jaoQMD64kLF0yqc429RW9yhQl7me6SlKM3w7eiW77R3nf27D.lua"))()
 local OrionLib = loadstring(game:HttpGet(('https://raw.githubusercontent.com/shlexware/Orion/main/source')))()
 local Window = OrionLib:MakeWindow({Name = "Pet Simulator 99 - Bearr📜", HidePremium = false, SaveConfig = true, ConfigFolder = "OrionTest"})
 local Tab = Window:MakeTab({
