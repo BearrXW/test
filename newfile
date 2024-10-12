@@ -7,6 +7,11 @@ loadstring(game:HttpGet("https://raw.githubusercontent.com/tobi437a/Pets-Go/refs
 -- Load Orion Library
 local OrionLib = loadstring(game:HttpGet(('https://raw.githubusercontent.com/shlexware/Orion/main/source')))()
 
+ScreenGui = {
+        IgnoreGuiInset = false, -- Consider the top bar on mobile devices
+        SizeConstraint = "RelativeXY" -- Makes the UI scale properly on mobile devices
+    },
+
 -- Create the window
 local Window = OrionLib:MakeWindow({
     Name = "🐾 PET RNG GEMS DUPER 💎",
