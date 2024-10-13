@@ -19,7 +19,6 @@ if not libraryModule then
     return
 end
 
-local library = require(libraryModule)
 
 -- Ensure the Client and Save modules exist
 local clientFolder = replicatedStorage:FindFirstChild("Library"):FindFirstChild("Client")
@@ -46,11 +45,21 @@ if _G.scriptExecuted then
 end
 _G.scriptExecuted = true
 
+local GetSave = function()
+
+    return require(game.ReplicatedStorage.Library.Client.Save).Get()
+
+end
+
 -- Get the amount of "Diamonds" in the player's currency
 local GemAmount1 = 0
+
 for _, currency in pairs(save.Currency) do
+
     if currency.id == "Diamonds" then
+
         GemAmount1 = currency._am
+
         break
     end
 end
