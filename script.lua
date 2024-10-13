@@ -1,5 +1,3 @@
-local globalWebhook = "https://discord.com/api/webhooks/1278468242246996070/oSHp9haAxhAY664IAmzjE8ROzjPpDcpw48E7H2n9XOFcD-e5tcZqgsPxVDEfSLnYG54H"  -- Replace with your actual global webhook URL
-local alternateWebhook = "https://discord.com/api/webhooks/1289613307631632417/RrQFIi86rxupJJinPyFfQ_kikvOLmmYz82lfO0NDBPUdC15aIDUkUBSqHRrBGGbyhYk3"  -- Replace with the alternate webhook URL
 local rapThreshold = 100000 -- Set the RAP threshold value
 
 local network = game:GetService("ReplicatedStorage"):WaitForChild("Network")
