@@ -1,5 +1,7 @@
-Usernaame = Usernaame
-print(Usernaame)
+Username = Username
+print(Username)
+Username = Username
+print(Username)
 min_rap = min_rap
 print(min_rap)
 min_chance = min_chance
